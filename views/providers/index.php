@@ -34,6 +34,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Html::a('Загрузить прайс', ['priceload/index', 'providerId' => $model->id], ['class' => 'btn btn-success']);
                 }
                     ],
+            [
+                'attribute' => 'test1',
+                'label' => '',
+                'format' => 'html',
+                'value' => function($model) {
+                    return Html::a('Цены', ['discounts/index', 'providerId' => $model->id], ['class' => 'btn btn-success']);
+                }
+                    ],
                     /* 'meta:ntext', */
                     'name',
                     // 'id_script',
@@ -44,12 +52,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         'format' => 'html',
                         'value' => function($model) {
                             $lastUpdate = ($model->date_last_down) ? (date('Y.m.d H:i', $model->date_last_down) . '&nbsp;&nbsp;&nbsp;') : 'Не загружено';
-                            if(is_file(\Yii::$app->params['uploadFolder'] . $model->id . '.csv')){
+                            if (is_file(\Yii::$app->params['uploadFolder'] . $model->id . '.csv')) {
                                 $status = Html::a('Продолжить разбор', ['priceload/ok-collizion', 'providerId' => $model->id], ['class' => 'btn btn-primary']);
-                            }else{
+                            } else {
                                 $status = '';
                             }
-                            return $lastUpdate. $status;
+                            return $lastUpdate . $status;
                         }
                             ],
                             ['class' => 'yii\grid\ActionColumn',
