@@ -75,6 +75,7 @@ class DiscountsController extends Controller {
         $post = Yii::$app->request->post();
         if (Yii::$app->request->isPost) {
             $post['Discounts']['providers_id'] = $session['providerIdFullName'];
+//            $post['Discounts']['values'] = $post['Discounts']['values'] . ' ';
             $res = $model->load($post);
         }
 
@@ -104,11 +105,28 @@ class DiscountsController extends Controller {
     public function actionUpdate($id) {
         $model = $this->findModel($id);
 
+        $session = Yii::$app->session;
+        $session->open();
+        $post = Yii::$app->request->post();
+        if (Yii::$app->request->isPost) {
+            $post['Discounts']['providers_id'] = $session['providerIdFullName'];
+//            $post['Discounts']['values'] = $post['Discounts']['values'] . ' ';
+            $res = $model->load($post);
+        }
+
+        $types = \app\models\GoodsType::find()->all();
+        $arTypes = ['' => ' - Не выбран тип товара -'];
+        foreach ($types as $type) {
+            $arTypes[$type->type] = $type->name;
+        }
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['index']);
         } else {
             return $this->render('update', [
                         'model' => $model,
+                        'arTypes' => $arTypes,
+                        'providerName' => $session['providerIdFullNameName'],
             ]);
         }
     }
@@ -139,7 +157,7 @@ class DiscountsController extends Controller {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
-    
+
     public function actionGetTypeParams($type) {
         $params = \app\models\GoodsParamsName::find()->where('goods_type_type=:goods_type_type', [':goods_type_type' => $type])->orderBy('sort ASC')->all();
         $arParams = ['' => ' - Добавить параметр - '];
@@ -148,7 +166,7 @@ class DiscountsController extends Controller {
         }
         print \yii\helpers\BaseHtml::dropDownList('listParams', '', $arParams);
     }
-    
+
     public function actionGetTypeValues($param) {
         $params = \app\models\GoodsParams::find()->where('goods_params_name_id=:goods_params_name_id', [':goods_params_name_id' => $param])->orderBy('sort ASC')->all();
         $arParams = ['' => ' - Выбрать значение - '];
@@ -156,6 +174,25 @@ class DiscountsController extends Controller {
             $arParams[$param->id] = $param->value;
         }
         print \yii\helpers\BaseHtml::dropDownList('listValues', '', $arParams);
+    }
+
+    public function actionRefreshRender($val) {
+        $arRes = [];
+        $arVals = explode(';', $val);
+        foreach ($arVals as $val) {
+            $oVal = \app\models\GoodsParams::findOne($val);
+//            print ('<pre>');print_r($oVal);print('</pre>');
+//            $oPar = $oVal->getGoodsParamsName();
+            $oPar = \app\models\GoodsParamsNameSearch::findOne($oVal->goods_params_name_id);
+//            print ('<pre>');print_r($oPar);print('</pre>');exit('100');
+            $arRes[$oPar->id] = [
+                'paramId' => $oPar->id,
+                'paramName' => $oPar->name,
+                'valId' => $oVal->id,
+                'valValue' => $oVal->value,
+            ];
+        }
+        print json_encode(['res' => 'ok', 'items' => $arRes]);
     }
 
 }

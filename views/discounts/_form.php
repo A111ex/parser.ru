@@ -15,8 +15,8 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'goods_type_type')->dropDownList($arTypes) ?>
 
     <div class="hidden">
+        <?= $form->field($model, 'values')->hiddenInput(['maxlength' => true]) ?>
         <?= $form->field($model, 'params')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'values')->textInput(['maxlength' => true]) ?>
     </div>
     <div class="listParamsValues"></div>
     <div class="formiratorListParams">
@@ -28,7 +28,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'coef')->textInput() ?>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success btn-save' : 'btn btn-primary btn-save']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
@@ -36,6 +36,7 @@ use yii\widgets\ActiveForm;
 </div>
 <script>
 <?php ob_start(); ?>
+
     $('#discounts-goods_type_type').change(function () {
         $('.listParams').load('/<?= $this->context->id ?>/get-type-params?type=' + $(this).val(), function () {
             $('[name=listParams]').change(function () {
@@ -60,7 +61,6 @@ use yii\widgets\ActiveForm;
     var params = {};
 
     $('.btnParams').click(function () {
-//        ParamValue.params[$('[name=listParams]').val()] = {paramId: $('[name=listParams]').val(), paramName: $('[name=listParams] :selected').text(), valId: $('[name=listValues]').val(), valValue: $('[name=listValues] :selected').text()};
         ParamValue.addParam($('[name=listParams]').val(), {paramId: $('[name=listParams]').val(), paramName: $('[name=listParams] :selected').text(), valId: $('[name=listValues]').val(), valValue: $('[name=listValues] :selected').text()});
         ParamValue.render();
         $('[name=listParams]').val('');
@@ -82,7 +82,6 @@ use yii\widgets\ActiveForm;
                 newParams[arW[i]] = this.params[arW[i]];
             }
             this.params = newParams;
-
         },
         render: function () {
             var arParams = [];
@@ -102,10 +101,26 @@ use yii\widgets\ActiveForm;
             });
         }
     }
+    
+    $('.btn-save').click(function(){
+        if(!$('.btnParams').hasClass('hidden')){
+            $('.btnParams').click();
+        }
+    })
 
-    function renderParamValues() {
-
+    if ($('#discounts-values').val()) {
+    console.log($('#discounts-values').val());
+    console.log($('#discounts-values').val().length);
+        $.getJSON('/<?= $this->context->id ?>/refresh-render?val=' + $('#discounts-values').val(), function (json) {
+            if (json.res = 'ok') {
+                for (var i in json.items) {
+                    ParamValue.addParam(i, json.items[i]);
+                }
+                ParamValue.render();
+            }
+        });
     }
+    $('#discounts-goods_type_type').change();
 
 <?php
 $js = ob_get_contents();
