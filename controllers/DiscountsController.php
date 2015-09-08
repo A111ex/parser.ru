@@ -34,6 +34,8 @@ class DiscountsController extends Controller {
         $session->open();
         if ($providerId) {
             $session['providerIdFullName'] = $providerId;
+            $provider = \app\models\Providers::findOne($providerId);
+            $session['providerIdFullNameName'] = $provider->name;
             $this->redirect('/' . $this->id);
         }
 
@@ -76,12 +78,19 @@ class DiscountsController extends Controller {
             $res = $model->load($post);
         }
 
+        $types = \app\models\GoodsType::find()->all();
+        $arTypes = ['' => ' - Не выбран тип товара -'];
+        foreach ($types as $type) {
+            $arTypes[$type->type] = $type->name;
+        }
 
         if ($model->load($post) && $model->save()) {
             return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                         'model' => $model,
+                        'arTypes' => $arTypes,
+                        'providerName' => $session['providerIdFullNameName'],
             ]);
         }
     }
@@ -129,6 +138,24 @@ class DiscountsController extends Controller {
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+    
+    public function actionGetTypeParams($type) {
+        $params = \app\models\GoodsParamsName::find()->where('goods_type_type=:goods_type_type', [':goods_type_type' => $type])->orderBy('sort ASC')->all();
+        $arParams = ['' => ' - Добавить параметр - '];
+        foreach ($params as $param) {
+            $arParams[$param->id] = $param->name;
+        }
+        print \yii\helpers\BaseHtml::dropDownList('listParams', '', $arParams);
+    }
+    
+    public function actionGetTypeValues($param) {
+        $params = \app\models\GoodsParams::find()->where('goods_params_name_id=:goods_params_name_id', [':goods_params_name_id' => $param])->orderBy('sort ASC')->all();
+        $arParams = ['' => ' - Выбрать значение - '];
+        foreach ($params as $param) {
+            $arParams[$param->id] = $param->value;
+        }
+        print \yii\helpers\BaseHtml::dropDownList('listValues', '', $arParams);
     }
 
 }
