@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\DiscountsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Скидки и наценки';
+$this->title = 'Скидки и наценки поставщика "'.$providerName.'"';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="discounts-index">
@@ -16,40 +16,57 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Discounts', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Добавить наценку', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?= GridView::widget([
+    <?=
+    GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
 //            'id',
 //            'providers_id',
+            [
+                'attribute' => 'goods_type_type',
+                'label' => 'Тип товара',
+                'format' => 'html',
+                'value' => function($model) {
+                    $oGT = \app\models\GoodsType::findOne($model->goods_type_type);
+                    return '['.$oGT->type.'] <b>'.$oGT->name.'</b>';
+                }
+            ],
             [
                 'attribute' => 'test1',
                 'label' => 'Параметр',
                 'format' => 'html',
                 'value' => function($model) {
-                    return $model->params . ' ' . $model->values;
+                    $arP = explode(';', $model->params);
+                    $arV = explode(';', $model->values);
+                    $arPP = [];
+                    foreach ($arP as $key => $paramId) {
+                        $oPar = \app\models\GoodsParamsName::findOne($paramId);
+                        $oVal = app\models\GoodsParams::findOne($arV[$key]);
+                        if ($oPar instanceof \app\models\GoodsParamsName && $oVal instanceof app\models\GoodsParams)
+                            $arPP[] = $oPar->name . ': <b>' . $oVal->value . '</b>';
+                    }
+                    return implode('; ', $arPP);
                 }
-                ],
-            [
-                'attribute' => 'coef1',
-                'label' => 'Коэффициент',
-                'format' => 'html',
-                'value' => function($model) {
-                    return $model->coef;
-                }
-                ],
-              'goods_type_type',
+                    ],
+                    [
+                        'attribute' => 'coef1',
+                        'label' => 'Коэффициент',
+                        'format' => 'html',
+                        'value' => function($model) {
+                            return $model->coef;
+                        }
+                    ],
 //            'params',
 //            'values',
 //            'coef',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
+                    ['class' => 'yii\grid\ActionColumn', 'template' => '{update} {delete}'],
+                ],
+            ]);
+            ?>
 
 </div>

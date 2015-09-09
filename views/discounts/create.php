@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Discounts */
 
-$this->title = 'Создать скидку для поставщика "'.$providerName.'"';
-$this->params['breadcrumbs'][] = ['label' => 'Скидки', 'url' => ['index']];
+$this->title = 'Создать наценку для поставщика "'.$providerName.'"';
+$this->params['breadcrumbs'][] = ['label' => 'Наценки', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="discounts-create">

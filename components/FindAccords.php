@@ -58,12 +58,18 @@ class FindAccords extends Object {
                 // Получить тип товара
                 $arResRow = $this->getGoodType($arResRow);
                 if (isset($this->arrAccords['identifier'])) { // Задан артикул
-                    $res = $this->getAccordsByIdentifier($arStrCSV);
+                    $res = $this->getAccordsByIdentifier($arResRow);
                 } else { // Не задан артикул
-                    $res = $this->getAccordsByName($arStrCSV);
+                    $res = $this->getAccordsByName($arResRow);
                 }
                 if ($res instanceof Accords) { // Есть соответствие
-                    // Пишем в таблицу предложений - TODO
+                    // Пишем в таблицу предложений
+                    $offer = new \app\models\Offers();
+                    $offer->quantity = $arResRow['quantity'];
+                    $offer->price = $arResRow['price'];
+                    $offer->goods_id = $res->goods_id;
+                    $offer->providers_id = $res->providers_id;
+                    $offer->save();
                 } else { // Нет соответствия
                     // Вывести на согласование
                     $arResRow['k'] = $k;
@@ -131,12 +137,12 @@ class FindAccords extends Object {
         return $arRes;
     }
 
-    private function getAccordsByIdentifier($arStrCSV) {
-        return Accords::findOne('identifier == :identifier AND providers_id = :providers_id', [':identifier' => $this->arrAccords['identifier'], ':providers_id' => $this->providerId]);
+    private function getAccordsByIdentifier($arResRow) {
+        return Accords::find()->where('identifier = :identifier AND providers_id = :providers_id', [':identifier' => $arResRow['identifier'], ':providers_id' => $this->providerId])->one();
     }
 
-    private function getAccordsByName($arStrCSV) {
-        return Accords::findOne('identifier == :identifier AND providers_id = :providers_id', [':identifier' => $this->arrAccords['name'], ':providers_id' => $this->providerId]);
+    private function getAccordsByName($arResRow) {
+        return Accords::find()->where('identifier = :identifier AND providers_id = :providers_id', [':identifier' => $arResRow['name'], ':providers_id' => $this->providerId])->one();
     }
 
 }

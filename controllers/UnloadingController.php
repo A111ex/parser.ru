@@ -27,42 +27,7 @@ class UnloadingController extends Controller {
             exit('уруру');
         }
 
-        $offers = \app\models\Offers::find()->all();
-        $arCsv = ['Название;Поставщик;Цена;Количество'];
-
-        $providers = \app\models\Providers::find()->all();
-        $arProviders = [];
-        foreach ($providers as $value) {
-            $arProviders[$value->id] = $value->name;
-        }
-
-        foreach ($offers as $offer) {
-            $name = \app\components\Goods::getName($offer->goods_id);
-            $provider = $arProviders[$offer->providers_id];
-            $price = $offer->price;
-            $quantity = $offer->quantity;
-            $arCsv[] = "$name;$provider;$price;$quantity";
-        }
-        $csv = implode(chr(10), $arCsv);
-        
-        $fileName = 'prise.csv';
-
-        if (ob_get_level()) {
-            ob_end_clean();
-        }
-        if(ini_get('zlib.output_compression'))
-          ini_set('zlib.output_compression', 'Off');
-        header('Content-Description: File Transfer');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename=' . $fileName);
-        header('Content-Transfer-Encoding: binary');
-        header('Expires: 0');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Content-Length: ' . strlen($csv));
-        
-        print iconv('utf-8', 'windows-1251', $csv);
-        exit;
+        $this->$profile();
     }
 
     private function profileDefault($mode = 'run') {
@@ -71,6 +36,49 @@ class UnloadingController extends Controller {
                 'name' => 'Базовый',
                 'description' => 'Профиль по умолчанию',
             ];
+        }
+
+        if ($mode == 'run') {
+
+            $offers = \app\models\Offers::find()->all();
+            $arCsv = ['Название;Поставщик;Исходная цена;Посчитанная цена;Количество'];
+
+            $providers = \app\models\Providers::find()->all();
+            $arProviders = [];
+            foreach ($providers as $value) {
+                $arProviders[$value->id] = $value->name;
+            }
+
+            foreach ($offers as $offer) {
+                $name = \app\components\Goods::getName($offer->goods_id);
+                $provider = $arProviders[$offer->providers_id];
+                $price = $offer->price;
+                $quantity = $offer->quantity;
+//                print $name;
+                $calcPrice = $price * \app\components\CalculationDiscount::calc($offer);
+//                $calcPrice =  \app\components\CalculationDiscount::calc($offer);
+                $arCsv[] = "$name;$provider;$price;$calcPrice;$quantity";
+            }
+            $csv = implode(chr(10), $arCsv);
+
+            $fileName = 'prise.csv';
+
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+            if (ini_get('zlib.output_compression'))
+                ini_set('zlib.output_compression', 'Off');
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename=' . $fileName);
+            header('Content-Transfer-Encoding: binary');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . strlen($csv));
+
+            print iconv('utf-8', 'windows-1251', $csv);
+            exit;
         }
     }
 

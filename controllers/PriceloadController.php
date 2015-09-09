@@ -232,11 +232,10 @@ class PriceloadController extends Controller {
         }
 
 
-
         //Добавить запись в таблицу Accords
         if ($saveAccord == 'y') {
             $accord = new \app\models\Accords();
-            $identifier = (isset($priceArr['identifier']) && strlen($priceArr['identifier']) > 0) ? ($priceArr['identifier'] . '_' . $priceArr['name']) : $priceArr['name'];
+            $identifier = (isset($priceArr['identifier']) && strlen($priceArr['identifier']) > 0) ? $priceArr['identifier'] : $priceArr['name'];
             $accord->identifier = $identifier;
             $accord->goods_id = $goodId;
             $accord->providers_id = $cach['providerId'];

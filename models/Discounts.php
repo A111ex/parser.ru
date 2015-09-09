@@ -76,11 +76,6 @@ class Discounts extends \yii\db\ActiveRecord {
     }
 
     public function compositeUnique($attribute, $params) {
-//        print ('<pre>');
-//        print_r(11);
-//        print('</pre>');
-//        exit('100');
-
         $ar = [
             ':providers_id' => $this->providers_id,
             ':values' => $this->values,
@@ -88,7 +83,7 @@ class Discounts extends \yii\db\ActiveRecord {
         ];
 
         $valid = Discounts::find()->where('providers_id=:providers_id and goods_type_type=:goods_type_type and `values`=:values', $ar)->one();
-        if ($valid instanceof Discounts) {
+        if ($valid instanceof Discounts && $valid->id != $this->id) {
             $this->addError($attribute, 'Такая скидка уже задана');
         }
     }

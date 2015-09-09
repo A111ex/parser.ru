@@ -18,21 +18,19 @@ use Yii;
  * @property GoodsTTyre $goodsTTyre
  * @property Offers[] $offers
  */
-class Goods extends \yii\db\ActiveRecord
-{
+class Goods extends \yii\db\ActiveRecord {
+
     /**
      * @inheritdoc
      */
-    public static function tableName()
-    {
+    public static function tableName() {
         return 'goods';
     }
 
     /**
      * @inheritdoc
      */
-    public function rules()
-    {
+    public function rules() {
         return [
             [['goods_type_type'], 'required'],
             [['name'], 'string', 'max' => 150],
@@ -43,8 +41,7 @@ class Goods extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels() {
         return [
             'id' => 'ID',
             'name' => 'Название',
@@ -55,48 +52,37 @@ class Goods extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getGoodsTyre()
-    {
+    public function getGoodsTyre() {
         return $this->hasOne(GoodsTyre::className(), ['goods_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAccords()
-    {
+    public function getAccords() {
         return $this->hasMany(Accords::className(), ['goods_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getGoodsTypeType()
-    {
+    public function getGoodsTypeType() {
         return $this->hasOne(GoodsType::className(), ['type' => 'goods_type_type']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getGoodsTDiscs()
-    {
-        return $this->hasOne(GoodsTDiscs::className(), ['goods_id' => 'id']);
+    public function getGoodsT() {
+        \app\models\GoodsT::$tabName = 'goods_t_' . $this->goods_type_type;
+        return \app\models\GoodsT::findOne($this->id);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getGoodsTTyre()
-    {
-        return $this->hasOne(GoodsTTyre::className(), ['goods_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getOffers()
-    {
+    public function getOffers() {
         return $this->hasMany(Offers::className(), ['goods_id' => 'id']);
     }
+
 }
