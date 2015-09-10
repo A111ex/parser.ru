@@ -15,25 +15,64 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <p>
-        <?= Html::a('Create Offers', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+    <?=
+    $this->render('_row_filter', [
+        'title' => 'Тип товара',
+        'name' => 'goodsType',
+        'data' => $goodsType,
+        'ch' => 'tyre',
+    ])
+    ?>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+    <?=
+    $this->render('_row_filter', [
+        'title' => 'Поставщик',
+        'name' => 'goodsProvider',
+        'data' => $goodsProvider,
+        'ch' => '',
+    ])
+    ?>
 
-            'id',
-            'quantity',
-            'fix_price',
-            'providers_id',
-            'goods_id',
-            // 'price',
-
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
+    <div class="additionsRows"></div>
 
 </div>
+
+
+<script>
+<?php ob_start(); ?>
+    initSel = function (obj) {
+        obj.find('.sel-prop').change(function () {
+            var selProp = $(this).val();
+            $(this).parents('[data-row-prop]').find('[data-prop]').removeClass('btn-primary').addClass('btn-default');
+            $(this).parents('[data-row-prop]').find('[data-prop="' + selProp + '"]').removeClass('btn-default').addClass('btn-primary');
+        });
+
+        obj.find('[data-prop]').click(function () {
+            $(this).parents('[data-row-prop]').find('.sel-prop').val($(this).attr('data-prop')).change();
+        });
+        obj.find('.sel-prop').change();
+    };
+
+    $('[name="goodsType"]').change(function () {
+
+        $.get('/<?= $this->context->id ?>/get-add-filer-rows', {goodsType: $(this).val()},
+        function (data) {
+            $('.additionsRows').html(data);
+            $('.additionsRows [data-row-prop]').each(function () {
+                initSel($(this));
+            });
+        }
+        )
+    })
+
+    $('[data-row-prop]').each(function () {
+        initSel($(this));
+    });
+<?php
+$js = ob_get_contents();
+ob_end_clean();
+?>
+</script>
+<?php
+$this->registerJs($js);
+?>

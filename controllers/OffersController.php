@@ -12,10 +12,9 @@ use yii\filters\VerbFilter;
 /**
  * OffersController implements the CRUD actions for offers model.
  */
-class OffersController extends Controller
-{
-    public function behaviors()
-    {
+class OffersController extends Controller {
+
+    public function behaviors() {
         return [
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -30,63 +29,39 @@ class OffersController extends Controller
      * Lists all offers models.
      * @return mixed
      */
-    public function actionIndex()
-    {
-        $searchModel = new offersSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+    public function actionIndex() {
+        $gt = \app\models\GoodsType::find()->orderBy('name')->all();
+        $gp = \app\models\Providers::find()->orderBy('id')->all();
+
+        $goodsType = \yii\helpers\ArrayHelper::map($gt, 'type', 'name');
+        $goodsProvider = \yii\helpers\ArrayHelper::map($gp, 'id', 'name');
+        $goodsProvider = ['' => ' - Все - '] + $goodsProvider;
 
         return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
+                    'goodsType' => $goodsType,
+                    'goodsProvider' => $goodsProvider,
         ]);
     }
 
-    /**
-     * Displays a single offers model.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
+    public function actionGetAddFilerRows($goodsType) {
+
+        $paramsName = \app\models\GoodsParamsName::find()->where('goods_type_type=:goods_type_type', [':goods_type_type' => $goodsType])->all();
+        $arRes = \yii\helpers\ArrayHelper::toArray($paramsName, [
+                    'app\models\GoodsParamsName' => [
+                        'title' => 'name',
+                        'name' => 'id',
+                        'data' => function ($paramsName) {
+                            return \yii\helpers\ArrayHelper::map($paramsName->getGoodsParams()->all(), 'id', 'value');
+                        },
+                        'ch' => function() {
+                            return '';
+                        }
+                    ],
         ]);
-    }
+        header('Content-Type: utf-8');
 
-    /**
-     * Creates a new offers model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
-     */
-    public function actionCreate()
-    {
-        $model = new offers();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
-        }
-    }
-
-    /**
-     * Updates an existing offers model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        foreach ($arRes as $value) {
+            print $this->renderPartial('_row_filter', $value);
         }
     }
 
@@ -96,26 +71,10 @@ class OffersController extends Controller
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the offers model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return offers the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = offers::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
-        }
-    }
+//    public function actionDelete($id)
+//    {
+//        $this->findModel($id)->delete();
+//
+//        return $this->redirect(['index']);
+//    }
 }

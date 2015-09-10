@@ -38,7 +38,8 @@ AppAsset::register($this);
                 'items' => [
                     ['label' => 'Типы товара', 'url' => ['/goods-type/index']],
                     ['label' => 'Имя в прайсе', 'url' => ['/accords/index']],
-//                    ['label' => 'Просмотр и редактирования товара', 'url' => ['/goods/index']],
+//                    ['label' => 'Товараы', 'url' => ['/goods/index']],
+                    ['label' => 'Предложения', 'url' => ['/offers/index']],
                     ['label' => 'Выгрузка', 'url' => ['/unloading/index']],
                     Yii::$app->user->isGuest ?
                             ['label' => 'Login', 'url' => ['/site/login']] :
