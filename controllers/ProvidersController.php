@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use Yii;
 use app\models\providers;
-use app\models\providersSearch;
+use app\models\ProvidersSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -32,7 +32,7 @@ class ProvidersController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new providersSearch();
+        $searchModel = new ProvidersSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
