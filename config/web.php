@@ -68,7 +68,16 @@ $config = [
         // 'route' => 'site/index',
         // 'suffix' => '.html',
         // ],
-        ]
+        ],
+        'assetManager' => [
+            'bundles' => [
+                'all' => [
+                    'class' => 'yii\web\AssetBundle',
+                    'basePath' => '@webroot/assets',
+                    'baseUrl' => '@web/assets',
+                ],
+            ],
+        ],
     ],
     'params' => $params,
 ];
