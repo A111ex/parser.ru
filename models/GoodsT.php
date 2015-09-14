@@ -35,8 +35,6 @@ class GoodsT extends \yii\db\ActiveRecord {
      * @inheritdoc
      */
     public static function tableName() {
-        return 'goods_t_tyre';
-        print ('<pre>');print_r(self::$tabName);print('</pre>');exit('100');
         return self::$tabName;
 //        return $this->tabName;
     }

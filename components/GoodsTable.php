@@ -10,7 +10,7 @@ class GoodsTable extends Object {
      * Удалить таблицу типа товара
      */
     public function delGoodsTable($type) {
-        $sql = "DROP TABLE IF EXISTS `parser_yii`.`goods_t_{$type}` ;";
+        $sql = "DROP TABLE IF EXISTS `goods_t_{$type}` ;";
         $connection = \Yii::$app->db;
         $command = $connection->createCommand($sql);
         $rowCount = $command->execute();
