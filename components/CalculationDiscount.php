@@ -34,7 +34,7 @@ class CalculationDiscount extends Object {
             }
         }
 
-        //Получить свойства товара
+        //Получить свойства товара 
         $good = \app\models\Goods::findOne($offer->goods_id);
         $goodT = \yii\helpers\ArrayHelper::toArray($good->getGoodsT());
         //Для каждой наценки проверить - подходит ли товар под нее
