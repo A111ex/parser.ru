@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\providers;
+use app\models\Providers;
 use app\models\ProvidersSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
