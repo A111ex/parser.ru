@@ -23,3 +23,5 @@ composer.phar
 phpunit.phar
 # local phpunit config
 /phpunit.xml
+
+/config/db.php
