@@ -22,7 +22,6 @@ class PriceloadController extends Controller {
      */
     public function actionIndex($providerId) {
         $model = new PriceloadForm();
-
         if (Yii::$app->request->isPost) {
             $model->fileName = UploadedFile::getInstance($model, 'fileName');
             if ($model->upload($providerId)) {

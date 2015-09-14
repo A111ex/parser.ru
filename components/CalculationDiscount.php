@@ -41,10 +41,12 @@ class CalculationDiscount extends Object {
         $dds = self::$arDisconts[$offer->providers_id][$good->goods_type_type];
         $k = 1;
         $arK = [];
+        if (!is_array($dds))
+            return 1;
         foreach ($dds as $arDiscount) {
             if (count(array_intersect_assoc($arDiscount['arPV'], $goodT)) == count($arDiscount['arPV'])) {
                 $k = $k * $arDiscount['coef'];
-                $arK[] = $arDiscount['coef']; 
+                $arK[] = $arDiscount['coef'];
             }
         }
         return ($k > 1) ? $k : 1;

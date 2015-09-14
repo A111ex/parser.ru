@@ -18,8 +18,9 @@ class GoodsT extends \yii\db\ActiveRecord {
 
     public static $tabName;
 
-    function __construct($type, $config = array()) {
-        self::$tabName = $type;
+    function __construct($config = array(), $type=false) {
+        if($type !== false)
+            self::$tabName = $type;
         parent::__construct($config);
     }
 

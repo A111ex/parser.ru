@@ -31,7 +31,7 @@ class Goods extends Object {
         $goodType = \app\models\GoodsType::findOne($good->goods_type_type);
         $arGoodsParamsNames = $goodType->getGoodsParamsNames()->orderBy('sort')->all();
 
-        $arParams = ['goodType'=>$goodType ->name];
+        $arParams = ['goodType' => $goodType->name];
         foreach ($arGoodsParamsNames as $oParam) {
             $idParamVal = $goodT->{$oParam->id};
             $oParamValue = \app\models\GoodsParams::findOne($idParamVal);
@@ -75,7 +75,7 @@ class Goods extends Object {
 
         // Создать запись в таблице goods_t_
         $tableName = self::$goodTablePefix . $goodTypeId;
-        $oGootT = new \app\models\GoodsT($tableName);
+        $oGootT = new \app\models\GoodsT([], $tableName);
         $oGootT->goods_id = $goodId;
         $arGoodsParamsNames = self::getGoodTypeParams($goodTypeId);
         foreach ($arGoodsParamsNames as $oParam) {
