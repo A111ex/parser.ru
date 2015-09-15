@@ -7,7 +7,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use app\models\PriceloadForm;
 use yii\web\UploadedFile;
-use app\models\providers;
+use app\models\Providers;
 use app\components\ParserPrice;
 use app\components\FindAccords;
 
