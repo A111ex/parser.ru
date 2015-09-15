@@ -95,10 +95,10 @@ class FindAccords extends Object {
     private function normalizeStrOfPrice($arStrCSV) {
         // Проверить существование файла нормализации для текущего поставщика (с установкой)
         if (!isset($this->isExistNormalazeFile)) {
-            @include_once dir(__FILE__) . '/NormalazePrice/' . $this->providerId . '.php';
+            @include_once __DIR__ . '/NormalazePrice/' . $this->providerId . '.php';
             $this->isExistNormalazeFile = function_exists('normalizeStrOfPrice');
             if (!$this->isExistNormalazeFile) {
-                include_once dir(__FILE__) . '/NormalazePrice/default.php';
+                include_once __DIR__ . '/NormalazePrice/default.php';
             }
         }
         $arRes = normalizeStrOfPrice($arStrCSV, $this->arrAccords);
