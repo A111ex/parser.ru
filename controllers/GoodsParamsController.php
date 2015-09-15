@@ -134,8 +134,16 @@ class GoodsParamsController extends Controller {
         if (Yii::$app->request->isPost && $model->load($arPost) && $model->save()) {
             return $this->redirect(['index']);
         } else {
+            $listTypesParams = ['' => ' - - ',];
+            $parentParam = GoodsParams::find()->where('goods_params_name_id=:parent_param', [':parent_param' => $this->oGoodsParamsName->parent_param])->all();
+            $arParams = ['' => ' - - '];
+//            print ('<pre>');print_r($parentParam);print('</pre>');exit('100');
+            foreach ($parentParam as $value) {
+                $arParams[$value->id] = $value->value;
+            }
             return $this->render('update', [
                         'model' => $model,
+                        'arParams' => $arParams,
             ]);
         }
     }

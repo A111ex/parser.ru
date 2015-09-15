@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\OffersSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Offers';
+$this->title = 'Список предложений';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="offers-index">
@@ -43,8 +43,17 @@ $this->params['breadcrumbs'][] = $this->title;
     initSel = function (obj) {
         obj.find('.sel-prop').change(function () {
             var selProp = $(this).val();
-            $(this).parents('[data-row-prop]').find('[data-prop]').removeClass('btn-primary').addClass('btn-default');
-            $(this).parents('[data-row-prop]').find('[data-prop="' + selProp + '"]').removeClass('btn-default').addClass('btn-primary');
+            var parentRow = $(this).parents('[data-row-prop]')
+            parentRow.find('[data-prop]').removeClass('btn-primary').addClass('btn-default');
+            parentRow.find('[data-prop="' + selProp + '"]').removeClass('btn-default').addClass('btn-primary');
+            $('[data-parent-param="' + parentRow.attr('data-row-prop') + '"]').each(function () {
+                var parentParamId = $('[data-row-prop="'+$(this).attr('data-parent-param')+'"] select').val();
+                $.getJSON('/<?= $this->context->id ?>/link-filer-rows', {paramId: $(this).attr('data-row-prop'), parentParamId: parentParamId},
+                function (json) {
+                    $('[data-row-prop="'+json.paramId+'"]').html($(json.html).html());
+                    initSel($('[data-row-prop="'+json.paramId+'"]'));
+                });
+            });
         });
 
         obj.find('[data-prop]').click(function () {

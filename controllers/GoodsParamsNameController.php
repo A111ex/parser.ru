@@ -54,11 +54,13 @@ class GoodsParamsNameController extends Controller {
      * @return mixed
      */
     public function actionIndex() {
+        if(!isset($_GET['sort'])){
+            $_GET['sort'] = 'sort';
+        }
         $searchModel = new GoodsParamsNameSearch();
         $params = Yii::$app->request->queryParams;
         $params['GoodsParamsNameSearch']['goods_type_type'] = $this->goodType;
         $dataProvider = $searchModel->search($params);
-
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,

@@ -31,7 +31,16 @@ $this->params['breadcrumbs'][] = $this->title;
             'value',
             'public_value',
             'sort',
-            'link_category',
+//            'link_category',
+            [
+                'attribute' => 'link_category',
+                'label' => 'Привязано к',
+                'format' => 'html',
+                'value' => function($model) {
+                    $pp = app\models\GoodsParams::findOne($model->link_category);
+                    return $pp->value;
+                }
+                    ],
             [
                 'class' => 'yii\grid\ActionColumn',
                 'template' => '{update} {delete}',
