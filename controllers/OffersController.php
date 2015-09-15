@@ -45,7 +45,7 @@ class OffersController extends Controller {
 
     public function actionGetAddFilerRows($goodsType) {
 
-        $paramsName = \app\models\GoodsParamsName::find()->where('goods_type_type=:goods_type_type', [':goods_type_type' => $goodsType])->all();
+        $paramsName = \app\models\GoodsParamsName::find()->where('goods_type_type=:goods_type_type', [':goods_type_type' => $goodsType])->orderBy('sort')->all();
         $arRes = \yii\helpers\ArrayHelper::toArray($paramsName, [
                     'app\models\GoodsParamsName' => [
                         'title' => 'name',
