@@ -162,14 +162,23 @@ class DiscountsController extends Controller {
     public function actionGetTypeParams($type) {
         $params = \app\models\GoodsParamsName::find()->where('goods_type_type=:goods_type_type', [':goods_type_type' => $type])->orderBy('sort ASC')->all();
         $arParams = ['' => ' - Добавить параметр - '];
+        $arLinks = [];
         foreach ($params as $param) {
             $arParams[$param->id] = $param->name;
+            if ($param->parent_param) {
+                $arLinks[$param->id] = $param->parent_param;
+            }
         }
+        print '<script>oLinks = ' . json_encode($arLinks) . '</script>';
         print \yii\helpers\BaseHtml::dropDownList('listParams', '', $arParams);
     }
 
-    public function actionGetTypeValues($param) {
-        $params = \app\models\GoodsParams::find()->where('goods_params_name_id=:goods_params_name_id', [':goods_params_name_id' => $param])->orderBy('sort ASC')->all();
+    public function actionGetTypeValues($param, $link_category = false) {
+        if ($link_category) {
+            $params = \app\models\GoodsParams::find()->where('goods_params_name_id=:goods_params_name_id AND link_category=:link_category', [':goods_params_name_id' => $param, ':link_category' => $link_category])->orderBy('sort ASC')->all();
+        } else {
+            $params = \app\models\GoodsParams::find()->where('goods_params_name_id=:goods_params_name_id', [':goods_params_name_id' => $param])->orderBy('sort ASC')->all();
+        }
         $arParams = ['' => ' - Выбрать значение - '];
         foreach ($params as $param) {
             $arParams[$param->id] = $param->value;

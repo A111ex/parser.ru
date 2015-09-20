@@ -15,7 +15,7 @@ class CalculationDiscount extends Object {
 
     private static $arDisconts;
 
-    public static function calc($offer) {
+    public static function calc($goods_id, $providers_id) {
         //Получить список наценок
         if (!isset(self::$arDisconts)) {
             $arODisconts = \app\models\Discounts::find()->asArray()->all();
@@ -35,10 +35,10 @@ class CalculationDiscount extends Object {
         }
 
         //Получить свойства товара 
-        $good = \app\models\Goods::findOne($offer->goods_id);
+        $good = \app\models\Goods::findOne($goods_id);
         $goodT = \yii\helpers\ArrayHelper::toArray($good->getGoodsT());
         //Для каждой наценки проверить - подходит ли товар под нее
-        $dds = self::$arDisconts[$offer->providers_id][$good->goods_type_type];
+        $dds = self::$arDisconts[$providers_id][$good->goods_type_type];
         $k = 1;
         $arK = [];
         if (!is_array($dds))

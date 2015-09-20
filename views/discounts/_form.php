@@ -39,9 +39,20 @@ use yii\widgets\ActiveForm;
 
     $('#discounts-goods_type_type').change(function () {
         $('.listParams').load('/<?= $this->context->id ?>/get-type-params?type=' + $(this).val(), function () {
+            ParamValue.params = {};
+            ParamValue.render();
             $('[name=listParams]').change(function () {
                 if ($(this).val().length > 0) {
-                    $('.listValues').load('/<?= $this->context->id ?>/get-type-values?param=' + $(this).val(), function () {
+                    var parentParam = oLinks[$(this).val()];
+                    // oLinks - этот объект подргужается при выборе типа товара запросом /get-type-params . в ненм прописаны связи параметров. например {tyre_model;"tyre_brand"} - значит, что значения модели связаны со значениями марки
+                    link_category = '';
+                    if (typeof parentParam != 'undefined') {
+                        var setParentParam = ParamValue.params[parentParam]; // Выбранное ранее значение родительского параметра
+                        if (typeof setParentParam != 'undefined') {
+                            link_category = '&link_category=' + setParentParam.valId;
+                        }
+                    }
+                    $('.listValues').load('/<?= $this->context->id ?>/get-type-values?param=' + $(this).val() + link_category, function () {
                         $('[name=listValues]').change(function () {
                             if ($(this).val()) {
                                 $('.btnParams').removeClass('hidden');
@@ -61,7 +72,13 @@ use yii\widgets\ActiveForm;
     var params = {};
 
     $('.btnParams').click(function () {
-        ParamValue.addParam($('[name=listParams]').val(), {paramId: $('[name=listParams]').val(), paramName: $('[name=listParams] :selected').text(), valId: $('[name=listValues]').val(), valValue: $('[name=listValues] :selected').text()});
+        var curVal = $('[name=listParams]').val()
+        ParamValue.addParam(curVal, {paramId: curVal, paramName: $('[name=listParams] :selected').text(), valId: $('[name=listValues]').val(), valValue: $('[name=listValues] :selected').text()});
+        for(var i in oLinks){
+            if(oLinks[i] == curVal){
+                delete ParamValue.params[i];
+            }
+        }
         ParamValue.render();
         $('[name=listParams]').val('');
         $('.listValues').html('');
@@ -97,20 +114,21 @@ use yii\widgets\ActiveForm;
             $('.listParamsValues').html(listParamsValues);
             $('.glyphicon-trash').click(function () {
                 delete ParamValue.params[$(this).parent().attr('data-param-del')];
+                $('[name=listParams]').val('').change();
                 ParamValue.render();
             });
         }
     }
-    
-    $('.btn-save').click(function(){
-        if(!$('.btnParams').hasClass('hidden')){
+
+    $('.btn-save').click(function () {
+        if (!$('.btnParams').hasClass('hidden')) {
             $('.btnParams').click();
         }
     })
 
     if ($('#discounts-values').val()) {
-    console.log($('#discounts-values').val());
-    console.log($('#discounts-values').val().length);
+        console.log($('#discounts-values').val());
+        console.log($('#discounts-values').val().length);
         $.getJSON('/<?= $this->context->id ?>/refresh-render?val=' + $('#discounts-values').val(), function (json) {
             if (json.res = 'ok') {
                 for (var i in json.items) {

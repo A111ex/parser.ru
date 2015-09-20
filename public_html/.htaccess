@@ -9,3 +9,8 @@ RewriteCond %{REQUEST_FILENAME} !-d
 
 # otherwise forward it to index.php
 RewriteRule . index.php
+
+#AuthType Basic  
+#AuthName "Private zone. Only for us!"
+#AuthUserFile  X:\home\parser.ru\public_html/.htpasswd  
+#require valid-user

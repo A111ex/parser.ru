@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel app\models\GoodsParamsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Значения параметра "'.$this->context->oGoodsParamsName->name.'"';
+$this->title = 'Значения параметра "' . $this->context->oGoodsParamsName->name . '"';
 $this->params['breadcrumbs'][] = ['label' => 'Типы товаров', 'url' => ['/goods-type']];
 $this->params['breadcrumbs'][] = ['label' => $this->context->goodTypeName, 'url' => ['//goods-params-name']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -21,31 +21,35 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Добавить параметр', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?=
-    GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-//            'id',
-            'value',
-            'public_value',
-            'sort',
-//            'link_category',
-            [
-                'attribute' => 'link_category',
-                'label' => 'Привязано к',
-                'format' => 'html',
-                'value' => function($model) {
-                    $pp = app\models\GoodsParams::findOne($model->link_category);
-                    return $pp->value;
-                }
-                    ],
-            [
-                'class' => 'yii\grid\ActionColumn',
-                'template' => '{update} {delete}',
+    <?php
+    $link_category = [
+        'attribute' => 'link_category',
+        'label' => 'Привязано к',
+        'format' => 'html',
+        'value' => function($model) {
+            $pp = app\models\GoodsParams::findOne($model->link_category);
+            return $pp->value;
+        }
+    ];
+    if (is_array($parentsValues)) {
+        $link_category['filter'] = $parentsValues;
+    }
+
+
+    print GridView::widget([
+            'dataProvider' => $dataProvider,
+            'filterModel' => $searchModel,
+            'columns' => [
+                ['class' => 'yii\grid\SerialColumn'],
+                'value',
+                'public_value',
+                'sort',
+                $link_category,
+                [
+                    'class' => 'yii\grid\ActionColumn',
+                    'template' => '{update} {delete}',
+                ],
             ],
-        ],
     ]);
     ?>
 

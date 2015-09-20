@@ -65,10 +65,17 @@ class GoodsParamsController extends Controller {
         $params = Yii::$app->request->queryParams;
         $params['GoodsParamsSearch']['goods_params_name_id'] = $this->oGoodsParamsName->id;
         $dataProvider = $searchModel->search($params);
+        
+        $parentsValues = false;
+        if($this->oGoodsParamsName->parent_param){
+            $parentsValues = GoodsParams::find()->where('goods_params_name_id = :goods_params_name_id', [':goods_params_name_id' => $this->oGoodsParamsName->parent_param])->all();
+            $parentsValues = \yii\helpers\ArrayHelper::map($parentsValues, 'id', 'value');
+        }
 
         return $this->render('index', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
+                    'parentsValues' => $parentsValues,
         ]);
     }
 

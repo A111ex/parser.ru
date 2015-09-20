@@ -55,7 +55,7 @@ class UnloadingController extends Controller {
                 $price = $offer->price;
                 $quantity = $offer->quantity;
 //                print $name;
-                $calcPrice = $price * \app\components\CalculationDiscount::calc($offer);
+                $calcPrice = $price * \app\components\CalculationDiscount::calc($offer->goods_id, $offer->providers_id);
 //                $calcPrice =  \app\components\CalculationDiscount::calc($offer);
                 $arCsv[] = "$name;$provider;$price;$calcPrice;$quantity";
             }
@@ -82,11 +82,11 @@ class UnloadingController extends Controller {
         }
     }
 
-    private function profileDefault1($mode = 'run') {
+    private function profileBitrix($mode = 'run') {
         if ($mode == 'info') {
             return [
-                'name' => 'Базовый1',
-                'description' => 'Профиль по умолчанию',
+                'name' => 'Экспорт в Битрикс',
+                'description' => 'Экспорт в Битрикс',
             ];
         }
     }
