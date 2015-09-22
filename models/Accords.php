@@ -33,7 +33,7 @@ class Accords extends \yii\db\ActiveRecord
         return [
             [['goods_id', 'providers_id'], 'required'],
             [['goods_id', 'providers_id'], 'integer'],
-            [['identifier'], 'string', 'max' => 50]
+            [['identifier'], 'string', 'max' => 255]
         ];
     }
 

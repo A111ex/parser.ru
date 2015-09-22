@@ -23,7 +23,7 @@ class Goods extends Object {
      * @param type $id
      * @return type
      */
-    public static function getName($id) {
+    public static function getName($id, $mode = 'name') {
         $good = \app\models\Goods::findOne($id);
         \app\models\GoodsT::$tabName = self::$goodTablePefix . $good->goods_type_type;
         $goodT = \app\models\GoodsT::findOne($id);
@@ -38,6 +38,15 @@ class Goods extends Object {
             $arParams[$oParam->id] = ($oParamValue->public_value) ? (($oParamValue->public_value == \Yii::$app->params['emptyStringParam']) ? '' : $oParamValue->public_value) : $oParamValue->value;
         }
         $tpl = $goodType->template_view;
+        if ($mode = 'array') {
+            return [
+                'name'=>self::fullName($arParams, $tpl),
+                'goodTipe' => $goodType,
+                'good' => $good,
+                'params' => $arGoodsParamsNames,
+                'values' => $arParams,
+                ];
+        }
         return self::fullName($arParams, $tpl);
     }
 
@@ -86,8 +95,7 @@ class Goods extends Object {
         return $goodId;
     }
 
-    public static function get($goodId) {
-        
+    public static function getOGood($id) {
     }
 
     public static function getGoodTypeParams($goodTypeId) {

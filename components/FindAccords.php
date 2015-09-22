@@ -88,7 +88,6 @@ class FindAccords extends Object {
             ];
             Yii::$app->cache->set($key, $arRes);
         }
-
         return $arRes;
     }
 

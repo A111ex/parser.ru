@@ -21,6 +21,7 @@ class PriceloadController extends Controller {
      * @return mixed
      */
     public function actionIndex($providerId) {
+        
         $model = new PriceloadForm();
         if (Yii::$app->request->isPost) {
             $model->fileName = UploadedFile::getInstance($model, 'fileName');
@@ -71,7 +72,6 @@ class PriceloadController extends Controller {
             }
             $arAccords = (is_array($metaProv['accords'])) ? $metaProv['accords'] : [];
         }
-
         $row = 1;
         $rows = [];
         if (($handle = fopen(Yii::$app->params['uploadFolder'] . $filename, "r")) !== FALSE) {
@@ -112,11 +112,9 @@ class PriceloadController extends Controller {
         $session['priceFile'] = $filename;
 
 
-
         // Запустить парсер
         $FindAccords = new FindAccords($providerId, $filename, $metaProv['accords']);
         $arRes = $FindAccords->run();
-
         $arRes['arGoodTypes'] = ['' => ' - - '] + $arRes['arGoodTypes'];
 
 
@@ -147,7 +145,6 @@ class PriceloadController extends Controller {
         // Запустить парсер
         $FindAccords = new FindAccords($providerId, $filename, $metaProv['accords']);
         $arRes = $FindAccords->run();
-//        print ('<pre>');print_r($arRes);print('</pre>');exit('100');
         $cnt = 0;
         $arItems = [];
         foreach ($arRes['arrToAccord'] as $row) {
