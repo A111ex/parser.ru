@@ -38,7 +38,7 @@ class Goods extends Object {
             $arParams[$oParam->id] = ($oParamValue->public_value) ? (($oParamValue->public_value == \Yii::$app->params['emptyStringParam']) ? '' : $oParamValue->public_value) : $oParamValue->value;
         }
         $tpl = $goodType->template_view;
-        if ($mode = 'array') {
+        if ($mode == 'array') {
             return [
                 'name'=>self::fullName($arParams, $tpl),
                 'goodTipe' => $goodType,

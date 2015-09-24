@@ -29,7 +29,31 @@ class UnloadingController extends Controller {
 
         $this->$profile();
     }
+    
+    /*
+     * Вспомогательный метод - отдает браузеру на выгрузку файл с именем $fileName и содержимым $body
+     */
+    private function _unloadStr($fileName, $body){
 
+            if (ob_get_level()) {
+                ob_end_clean();
+            }
+            if (ini_get('zlib.output_compression'))
+                ini_set('zlib.output_compression', 'Off');
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename=' . $fileName);
+            header('Content-Transfer-Encoding: binary');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . strlen($body));
+
+            print $body;
+            exit;
+    }
+
+    
     private function profileDefault($mode = 'run') {
         if ($mode == 'info') {
             return [
@@ -60,25 +84,8 @@ class UnloadingController extends Controller {
                 $arCsv[] = "$name;$provider;$price;$calcPrice;$quantity";
             }
             $csv = implode(chr(10), $arCsv);
-
-            $fileName = 'prise.csv';
-
-            if (ob_get_level()) {
-                ob_end_clean();
-            }
-            if (ini_get('zlib.output_compression'))
-                ini_set('zlib.output_compression', 'Off');
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename=' . $fileName);
-            header('Content-Transfer-Encoding: binary');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . strlen($csv));
-
-            print iconv('utf-8', 'windows-1251', $csv);
-            exit;
+            
+            $this->_unloadStr('prise.csv', iconv('utf-8', 'windows-1251', $csv));
         }
     }
 
@@ -92,10 +99,11 @@ class UnloadingController extends Controller {
 
         function saveRow($curGoodId, $arPrise, $arQunt, $files) {
             $price = min($arPrise);
+            $provider = array_search($price, $arPrise);
+
             $quant = array_sum($arQunt);
             $arrGood = Goods::getName($curGoodId, 'array');
 
-//            print ('<pre>');print_r($arrGood['values']);print('</pre>');exit('100');
             $name = $arrGood['name'];
             $brend = $arrGood['values']['tyre_brand'];
             $model = $arrGood['values']['tyre_model'];
@@ -116,39 +124,49 @@ class UnloadingController extends Controller {
             $IP_PROP26 = ($arrGood['values']['tyre_spike']) ? 'да' : '';
             $IC_GROUP0 = $arrGood['values']['tyre_brand'];
             $IC_GROUP1 = $arrGood['values']['tyre_model'];
+            $PODRAZD = $provider;
 
-            $goodRow = "$name;$IP_PROP2;$IP_PROP23;$IP_PROP21;$IP_PROP3;$IP_PROP4;$IP_PROP13;$IP_PROP148;$IP_PROP8;$IP_PROP22;$IP_PROP24;$IP_PROP2;$IP_PROP26;$IC_GROUP0;$IC_GROUP1";
+            $goodRow = "$name;$IP_PROP2;$IP_PROP23;$IP_PROP21;$IP_PROP3;$IP_PROP4;$IP_PROP13;$IP_PROP148;$IP_PROP8;$IP_PROP22;$IP_PROP24;$IP_PROP2;$IP_PROP26;$IC_GROUP0;$IC_GROUP1;$PODRAZD";
             saveRowInGoods($goodRow, $files);
         }
 
         function saveRowInOffer($row, $files) {
-//            print "$row <br>";
-            
-            $filename = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$files[2];
-            file_put_contents($filename, $row.chr(10), FILE_APPEND);
+            $filename = $files['path'] . $files[2];
+            file_put_contents($filename, $row . chr(10), FILE_APPEND);
         }
 
         function saveRowInGoods($row, $files) {
-            print "$row <br>";
-            $filename = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$files[1];
-            file_put_contents($filename, $row.chr(10), FILE_APPEND);
+            $filename = $files['path'] . $files[1];
+            file_put_contents($filename, $row . chr(10), FILE_APPEND);
         }
-        
+
         $files = [
-          1=>'shina1_'.date('Y.m.d.H.i').'.csv', 
-          2=>'shina2_'.date('Y.m.d.H.i').'.csv', 
+            1 => 'shina1_' . date('Y.m.d.H.i') . '.csv',
+            2 => 'shina2_' . date('Y.m.d.H.i') . '.csv',
+            'zip' => 'shina_' . date('Y.m.d.H.i') . '.zip',
+            'path' => $_SERVER['DOCUMENT_ROOT'] . '/unload/tyre_bitrix/',
         ];
 
-        $arOffers = \app\models\Offers::find()->groupBy('goods_id')->all();
+        // Очистить папку выгрузки профиля
+        if ($handle = opendir($files['path'])) {
+            $i = 0;
+            while (false !== ($file = readdir($handle))) {
+                if(!in_array($file, ['.', '..']))
+                    unlink($files['path'].$file);
+            }
+            closedir($handle);
+        }
 
+        // Список поставщиков
+        $arProviders = \yii\helpers\ArrayHelper::map(\app\models\Providers::find()->all(), 'id', 'name');
+
+        // Список оферов шин
         $sql = "select * from offers as O INNER JOIN goods as G where O.goods_id = G.id and G.goods_type_type = 'tyre'";
-//        print $sql;
         $arOffers = \Yii::$app->db->createCommand($sql)->queryAll();
-//        print ('<pre>');print_r($arOffers);print('</pre>');exit('100');
 
         $curGoodId = 0;
         saveRowInOffer('IE_NAME;IC_GROUP0;IC_GROUP1;CP_QUANTITY;CV_PRICE_1;CV_CURRENCY_1', $files);
-        saveRowInGoods('IE_NAME;IP_PROP2;IP_PROP23;IP_PROP21;IP_PROP3;IP_PROP4;IP_PROP13;IP_PROP148;IP_PROP8;IP_PROP22;IP_PROP24;IP_PROP2;IP_PROP26;IC_GROUP0;IC_GROUP1', $files);
+        saveRowInGoods('IE_NAME;IP_PROP2;IP_PROP23;IP_PROP21;IP_PROP3;IP_PROP4;IP_PROP13;IP_PROP148;IP_PROP8;IP_PROP22;IP_PROP24;IP_PROP2;IP_PROP26;IC_GROUP0;IC_GROUP1;Подразделение', $files);
         foreach ($arOffers as $arOffer) {
             if ($arOffer['goods_id'] != $curGoodId) {
                 if ($curGoodId != 0) {
@@ -161,11 +179,23 @@ class UnloadingController extends Controller {
             $curGoodId = $arOffer['goods_id'];
 
             $arQunt[] = $arOffer['quantity'];
-            $arPrise[] = \app\components\CalculationDiscount::calc($arOffer['goods_id'], $arOffer['providers_id']) * $arOffer['price'];
+            $arPrise[$arProviders[$arOffer['providers_id']]] = \app\components\CalculationDiscount::calc($arOffer['goods_id'], $arOffer['providers_id']) * $arOffer['price'];
         }
 
-
-
+        // создать архив
+        $zip = new \ZipArchive();
+        $filename = $files['path']. $files['zip'];
+        if ($zip->open($filename, \ZipArchive::CREATE)!==TRUE) {
+            exit("Невозможно открыть <$filename>\n");
+        }
+        $zip->addFile($files['path']. $files[1], $files[1]);
+        $zip->addFile($files['path']. $files[2], $files[2]);
+        $zip->close();
+        
+        // оттать архив
+        $this->_unloadStr($files['zip'], file_get_contents($files['path']. $files['zip']));
+         
+        
 //        $minPriseOffers = \app\models\Offers::find()->groupBy('goods_id')->min('price');
 //        $arMinPriseOffers = \yii\helpers\ArrayHelper::map($minPriseOffers, 'goods_id', 'price');
 //        $sumQuntOffers = \app\models\Offers::find()->groupBy('goods_id')->sum('quantity');
