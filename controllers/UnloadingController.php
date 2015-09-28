@@ -29,31 +29,31 @@ class UnloadingController extends Controller {
 
         $this->$profile();
     }
-    
+
     /*
      * Вспомогательный метод - отдает браузеру на выгрузку файл с именем $fileName и содержимым $body
      */
-    private function _unloadStr($fileName, $body){
 
-            if (ob_get_level()) {
-                ob_end_clean();
-            }
-            if (ini_get('zlib.output_compression'))
-                ini_set('zlib.output_compression', 'Off');
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename=' . $fileName);
-            header('Content-Transfer-Encoding: binary');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . strlen($body));
+    private function _unloadStr($fileName, $body) {
 
-            print $body;
-            exit;
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+        if (ini_get('zlib.output_compression'))
+            ini_set('zlib.output_compression', 'Off');
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename=' . $fileName);
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . strlen($body));
+
+        print $body;
+        exit;
     }
 
-    
     private function profileDefault($mode = 'run') {
         if ($mode == 'info') {
             return [
@@ -84,7 +84,7 @@ class UnloadingController extends Controller {
                 $arCsv[] = "$name;$provider;$price;$calcPrice;$quantity";
             }
             $csv = implode(chr(10), $arCsv);
-            
+
             $this->_unloadStr('prise.csv', iconv('utf-8', 'windows-1251', $csv));
         }
     }
@@ -96,128 +96,118 @@ class UnloadingController extends Controller {
                 'description' => 'Экспорт шин в Битрикс',
             ];
         }
+        if ($mode == 'run') {
 
-        function saveRow($curGoodId, $arPrise, $arQunt, $files) {
-            $price = min($arPrise);
-            $provider = array_search($price, $arPrise);
+            function saveRow($curGoodId, $arPrise, $arQunt, &$arStrToSave) {
+                $price = min($arPrise);
+                $provider = array_search($price, $arPrise);
 
-            $quant = array_sum($arQunt);
-            $arrGood = Goods::getName($curGoodId, 'array');
+                $quant = array_sum($arQunt);
+                $arrGood = Goods::getName($curGoodId, 'array');
 
-            $name = $arrGood['name'];
-            $brend = $arrGood['values']['tyre_brand'];
-            $model = $arrGood['values']['tyre_model'];
-            $offerRow = "$name;$brend;$model;$quant;$price;RUB";
-            saveRowInOffer($offerRow, $files);
+                $name = $arrGood['name'];
+                $brend = $arrGood['values']['tyre_brand'];
+                $model = $arrGood['values']['tyre_model'];
+                $offerRow = "$name;$brend;$model;$quant;$price;RUB";
+                saveRowInOffer($offerRow, $arStrToSave);
 
-            $IP_PROP2 = $arrGood['values']['tyre_heigth'];
-            $IP_PROP23 = $arrGood['values']['tyre_width'];
-            $IP_PROP21 = $arrGood['values']['tyre_dia'];
-            $IP_PROP3 = $arrGood['values']['tyre_i_load'];
-            $IP_PROP4 = $arrGood['values']['tyre_i_speed'];
-            $IP_PROP13 = $arrGood['values']['tyre_model'];
-            $IP_PROP148 = ($arrGood['values']['tyre_rf']) ? 'да' : '';
-            $IP_PROP8 = $arrGood['values']['tyre_brand'];
-            $IP_PROP22 = $arrGood['values']['tyre_season'];
-            $IP_PROP24 = $arrGood['values']['tyre_type_auto'];
-            $IP_PROP2 = $arrGood['values']['tyre_model'];
-            $IP_PROP26 = ($arrGood['values']['tyre_spike']) ? 'да' : '';
-            $IC_GROUP0 = $arrGood['values']['tyre_brand'];
-            $IC_GROUP1 = $arrGood['values']['tyre_model'];
-            $PODRAZD = $provider;
+                $IP_PROP2 = $arrGood['values']['tyre_heigth'];
+                $IP_PROP23 = $arrGood['values']['tyre_width'];
+                $IP_PROP21 = $arrGood['values']['tyre_dia'];
+                $IP_PROP3 = $arrGood['values']['tyre_i_load'];
+                $IP_PROP4 = $arrGood['values']['tyre_i_speed'];
+                $IP_PROP13 = $arrGood['values']['tyre_model'];
+                $IP_PROP148 = ($arrGood['values']['tyre_rf']) ? 'да' : '';
+                $IP_PROP8 = $arrGood['values']['tyre_brand'];
+                $IP_PROP22 = $arrGood['values']['tyre_season'];
+                $IP_PROP24 = $arrGood['values']['tyre_type_auto'];
+                $IP_PROP2 = $arrGood['values']['tyre_model'];
+                $IP_PROP26 = ($arrGood['values']['tyre_spike']) ? 'да' : '';
+                $IC_GROUP0 = $arrGood['values']['tyre_brand'];
+                $IC_GROUP1 = $arrGood['values']['tyre_model'];
+                $PODRAZD = $provider;
 
-            $goodRow = "$name;$IP_PROP2;$IP_PROP23;$IP_PROP21;$IP_PROP3;$IP_PROP4;$IP_PROP13;$IP_PROP148;$IP_PROP8;$IP_PROP22;$IP_PROP24;$IP_PROP2;$IP_PROP26;$IC_GROUP0;$IC_GROUP1;$PODRAZD";
-            saveRowInGoods($goodRow, $files);
-        }
-
-        function saveRowInOffer($row, $files) {
-            $filename = $files['path'] . $files[2];
-            file_put_contents($filename, $row . chr(10), FILE_APPEND);
-        }
-
-        function saveRowInGoods($row, $files) {
-            $filename = $files['path'] . $files[1];
-            file_put_contents($filename, $row . chr(10), FILE_APPEND);
-        }
-
-        $files = [
-            1 => 'shina1_' . date('Y.m.d.H.i') . '.csv',
-            2 => 'shina2_' . date('Y.m.d.H.i') . '.csv',
-            'zip' => 'shina_' . date('Y.m.d.H.i') . '.zip',
-            'path' => $_SERVER['DOCUMENT_ROOT'] . '/unload/tyre_bitrix/',
-        ];
-
-        // Очистить папку выгрузки профиля
-        if ($handle = opendir($files['path'])) {
-            $i = 0;
-            while (false !== ($file = readdir($handle))) {
-                if(!in_array($file, ['.', '..']))
-                    unlink($files['path'].$file);
+                $goodRow = "$name;$IP_PROP2;$IP_PROP23;$IP_PROP21;$IP_PROP3;$IP_PROP4;$IP_PROP13;$IP_PROP148;$IP_PROP8;$IP_PROP22;$IP_PROP24;$IP_PROP2;$IP_PROP26;$IC_GROUP0;$IC_GROUP1;$PODRAZD";
+                saveRowInGoods($goodRow, $arStrToSave);
             }
-            closedir($handle);
-        }
 
-        // Список поставщиков
-        $arProviders = \yii\helpers\ArrayHelper::map(\app\models\Providers::find()->all(), 'id', 'name');
+            function saveRowInOffer($row, &$arStrToSave) {
+                $arStrToSave['Offer'] .= $row . chr(10);
+            }
 
-        // Список оферов шин
-        $sql = "select * from offers as O INNER JOIN goods as G where O.goods_id = G.id and G.goods_type_type = 'tyre'";
-        $arOffers = \Yii::$app->db->createCommand($sql)->queryAll();
+            function saveRowInGoods($row, &$arStrToSave) {
+                $arStrToSave['Goods'] .= $row . chr(10);
+            }
+            
+            function saveFiles($files, $arStrToSave) {
+                file_put_contents($files['path'] . $files[1], $arStrToSave['Goods']);
+                file_put_contents($files['path'] . $files[2], $arStrToSave['Offer']);
+            }
 
-        $curGoodId = 0;
-        saveRowInOffer('IE_NAME;IC_GROUP0;IC_GROUP1;CP_QUANTITY;CV_PRICE_1;CV_CURRENCY_1', $files);
-        saveRowInGoods('IE_NAME;IP_PROP2;IP_PROP23;IP_PROP21;IP_PROP3;IP_PROP4;IP_PROP13;IP_PROP148;IP_PROP8;IP_PROP22;IP_PROP24;IP_PROP2;IP_PROP26;IC_GROUP0;IC_GROUP1;Подразделение', $files);
-        foreach ($arOffers as $arOffer) {
-            if ($arOffer['goods_id'] != $curGoodId) {
-                if ($curGoodId != 0) {
-                    // Сохранить записи в файлах
-                    saveRow($curGoodId, $arPrise, $arQunt, $files);
+            $files = [
+                1 => 'shina1_' . date('Y.m.d.H.i') . '.csv',
+                2 => 'shina2_' . date('Y.m.d.H.i') . '.csv',
+                'zip' => 'shina_' . date('Y.m.d.H.i') . '.zip',
+                'path' => $_SERVER['DOCUMENT_ROOT'] . '/unload/tyre_bitrix/',
+            ];
+            
+            $arStrToSave = [
+                'Goods'=>'',
+                'Offer'=>'',
+            ];
+
+            // Очистить папку выгрузки профиля
+            if ($handle = opendir($files['path'])) {
+                $i = 0;
+                while (false !== ($file = readdir($handle))) {
+                    if (!in_array($file, ['.', '..']))
+                        unlink($files['path'] . $file);
                 }
-                $arPrise = [];
-                $arQunt = [];
+                closedir($handle);
             }
-            $curGoodId = $arOffer['goods_id'];
 
-            $arQunt[] = $arOffer['quantity'];
-            $arPrise[$arProviders[$arOffer['providers_id']]] = \app\components\CalculationDiscount::calc($arOffer['goods_id'], $arOffer['providers_id']) * $arOffer['price'];
-        }
+            // Список поставщиков
+            $arProviders = \yii\helpers\ArrayHelper::map(\app\models\Providers::find()->all(), 'id', 'name');
 
-        // создать архив
-        $zip = new \ZipArchive();
-        $filename = $files['path']. $files['zip'];
-        if ($zip->open($filename, \ZipArchive::CREATE)!==TRUE) {
-            exit("Невозможно открыть <$filename>\n");
+            // Список оферов шин
+            $sql = "select * from offers as O INNER JOIN goods as G where O.goods_id = G.id and G.goods_type_type = 'tyre'";
+            $arOffers = \Yii::$app->db->createCommand($sql)->queryAll();
+
+            $curGoodId = 0;
+            saveRowInOffer('IE_NAME;IC_GROUP0;IC_GROUP1;CP_QUANTITY;CV_PRICE_1;CV_CURRENCY_1', $arStrToSave);
+            saveRowInGoods('IE_NAME;IP_PROP2;IP_PROP23;IP_PROP21;IP_PROP3;IP_PROP4;IP_PROP13;IP_PROP148;IP_PROP8;IP_PROP22;IP_PROP24;IP_PROP2;IP_PROP26;IC_GROUP0;IC_GROUP1;Подразделение', $arStrToSave);
+            foreach ($arOffers as $arOffer) {
+                if ($arOffer['goods_id'] != $curGoodId) {
+                    if ($curGoodId != 0) {
+                        // Сохранить записи в файлах
+                        saveRow($curGoodId, $arPrise, $arQunt, $arStrToSave);
+                    }
+                    $arPrise = [];
+                    $arQunt = [];
+                }
+                $curGoodId = $arOffer['goods_id'];
+
+                $arQunt[] = $arOffer['quantity'];
+//                $arPrise[$arProviders[$arOffer['providers_id']]] = \app\components\CalculationDiscount::calc($arOffer['goods_id'], $arOffer['providers_id']) * $arOffer['price'];
+                $arPrise[$arProviders[$arOffer['providers_id']]] =  $arOffer['price'];
+            }
+            
+            // Сохранить на диск
+            saveFiles($files, $arStrToSave);
+
+            // создать архив
+            $zip = new \ZipArchive();
+            $filename = $files['path'] . $files['zip'];
+            if ($zip->open($filename, \ZipArchive::CREATE) !== TRUE) {
+                exit("Невозможно открыть <$filename>\n");
+            }
+            $zip->addFile($files['path'] . $files[1], $files[1]);
+            $zip->addFile($files['path'] . $files[2], $files[2]);
+            $zip->close();
+
+            // оттать архив
+            $this->_unloadStr($files['zip'], file_get_contents($files['path'] . $files['zip']));
         }
-        $zip->addFile($files['path']. $files[1], $files[1]);
-        $zip->addFile($files['path']. $files[2], $files[2]);
-        $zip->close();
-        
-        // оттать архив
-        $this->_unloadStr($files['zip'], file_get_contents($files['path']. $files['zip']));
-         
-        
-//        $minPriseOffers = \app\models\Offers::find()->groupBy('goods_id')->min('price');
-//        $arMinPriseOffers = \yii\helpers\ArrayHelper::map($minPriseOffers, 'goods_id', 'price');
-//        $sumQuntOffers = \app\models\Offers::find()->groupBy('goods_id')->sum('quantity');
-//        $arSumQuntOffers = \yii\helpers\ArrayHelper::map($sumQuntOffers, 'goods_id', 'quantity');
-//array(
-//    'IE_NAME'=> ,//Имя товара  (#строка с полным наименованием повар#);
-//    'IP_PROP2'=> ,//Свойство "Высота профиля" (#строка#); 
-//    'IP_PROP23'=> ,//Свойство "Ширина профиля" (#строка#); 
-//    'IP_PROP21'=> ,//Свойство "Радиус шины" (#строка#); 
-//    'IP_PROP3'=> ,//Свойство "Индекс нагрузки" (#строка#); 
-//    'IP_PROP4'=> ,//Свойство "Индекс скорости" (#строка#); 
-//    'IP_PROP13'=> ,//Свойство "Модель автошины"; 
-//    'IP_PROP148'=> ,//Свойство "Run Flat"; 
-//    'IP_PROP8'=> ,//Свойство "Производитель"; 
-//    'IP_PROP22'=> ,//Свойство "Сезонность";  № Летние'=> ,//Лето Зимние'=> ,//Зима Всесезонные №
-//    'IP_PROP24'=> ,//Свойство "Тип автошины ";  Легкогрузовая, Легковая,
-//    'IP_PROP2'=> ,//Свойство "Конструкция автошины"; -?
-//    'IP_PROP26'=> ,//Свойство "Шипы";  (#или Да или пусто#)
-//    'IC_GROUP0'=> ,//Группа уровня (1);  (Производитель)
-//    'IC_GROUP1'=> ,//Группа уровня (2)  (Модель автошины)
-//    'Подразделение'=> ,//Подразделение 1 (по умолчанию)
-//);
     }
 
 }
