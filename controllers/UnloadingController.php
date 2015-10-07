@@ -17,17 +17,21 @@ class UnloadingController extends Controller {
             }
         }
 
+        $arrPriceType = \yii\helpers\ArrayHelper::map(\app\models\PriceType::find()->all(), 'id', 'name');
+        $arrPriceType = [''=> ' - Не выбран тип цены - ']+$arrPriceType;
+        
         return $this->render('index', [
-                'arProfiles' => $arProfiles
+                'arProfiles' => $arProfiles,
+                'arrPriceType' => $arrPriceType,
         ]);
     }
 
-    public function actionUnload($profile) {
+    public function actionUnload($profile, $priceType) {
         if (!method_exists($this, $profile)) {
             exit('уруру');
         }
 
-        $this->$profile();
+        $this->$profile('run', $priceType);
     }
 
     /*
@@ -54,7 +58,7 @@ class UnloadingController extends Controller {
         exit;
     }
 
-    private function profileDefault($mode = 'run') {
+    private function profileDefault($mode = 'run', $priceType = null) {
         if ($mode == 'info') {
             return [
                 'name' => 'Базовый',
@@ -79,7 +83,7 @@ class UnloadingController extends Controller {
                 $price = $offer->price;
                 $quantity = $offer->quantity;
 //                print $name;
-                $calcPrice = $price * \app\components\CalculationDiscount::calc($offer->goods_id, $offer->providers_id);
+                $calcPrice = $price * \app\components\CalculationDiscount::calc($offer->goods_id, $offer->providers_id, $priceType);
 //                $calcPrice =  \app\components\CalculationDiscount::calc($offer);
                 $arCsv[] = "$name;$provider;$price;$calcPrice;$quantity";
             }
@@ -89,7 +93,7 @@ class UnloadingController extends Controller {
         }
     }
 
-    private function profileTyreBitrix($mode = 'run') {
+    private function profileTyreBitrix($mode = 'run', $priceType = null) {
         if ($mode == 'info') {
             return [
                 'name' => 'Экспорт шин в Битрикс',

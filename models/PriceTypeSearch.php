@@ -5,28 +5,29 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Discounts;
+use app\models\PriceType;
 
 /**
- * DiscountsSearch represents the model behind the search form about `app\models\Discounts`.
+ * PriceTypeSearch represents the model behind the search form about `app\models\PriceType`.
  */
-class DiscountsSearch extends Discounts {
-
+class PriceTypeSearch extends PriceType
+{
     /**
      * @inheritdoc
      */
-    public function rules() {
+    public function rules()
+    {
         return [
-            [['id', 'providers_id', 'price_type_id'], 'integer'],
-            [['goods_type_type', 'params', 'values'], 'safe'],
-            [['coef'], 'number'],
+            [['id'], 'integer'],
+            [['name'], 'safe'],
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function scenarios() {
+    public function scenarios()
+    {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
@@ -38,8 +39,9 @@ class DiscountsSearch extends Discounts {
      *
      * @return ActiveDataProvider
      */
-    public function search($params) {
-        $query = Discounts::find();
+    public function search($params)
+    {
+        $query = PriceType::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -55,16 +57,10 @@ class DiscountsSearch extends Discounts {
 
         $query->andFilterWhere([
             'id' => $this->id,
-            'providers_id' => $this->providers_id,
-            'coef' => $this->coef,
-            'price_type_id' => $this->price_type_id,
         ]);
 
-        $query->andFilterWhere(['like', 'goods_type_type', $this->goods_type_type])
-            ->andFilterWhere(['like', 'params', $this->params])
-            ->andFilterWhere(['like', 'values', $this->values]);
+        $query->andFilterWhere(['like', 'name', $this->name]);
 
         return $dataProvider;
     }
-
 }

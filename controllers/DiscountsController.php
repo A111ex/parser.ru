@@ -29,7 +29,7 @@ class DiscountsController extends Controller {
      * Lists all Discounts models.
      * @return mixed
      */
-    public function actionIndex($providerId = null) {
+    public function actionIndex($providerId = null, $typePrice = null) {
         $session = Yii::$app->session;
         $session->open();
         if ($providerId) {
@@ -39,17 +39,30 @@ class DiscountsController extends Controller {
             $this->redirect('/' . $this->id);
         }
 
+        $arrPriceType = \yii\helpers\ArrayHelper::map(\app\models\PriceType::find()->all(), 'id', 'name');
+
+        if ($typePrice) {
+            $session['typePrice'] = $typePrice;
+            $session['typePriceName'] = $arrPriceType[$typePrice];
+            $this->redirect('/' . $this->id);
+        }
+
         $searchModel = new DiscountsSearch();
 
         $arParams = Yii::$app->request->queryParams;
         $arParams['DiscountsSearch']['providers_id'] = $session['providerIdFullName'];
+//        if ($session['typePrice'])
+            $arParams['DiscountsSearch']['price_type_id'] = $session['typePrice'];
 
         $dataProvider = $searchModel->search($arParams);
 
         return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
-                    'providerName' => $session['providerIdFullNameName'],
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'providerName' => $session['providerIdFullNameName'],
+                'arrPriceType' => $arrPriceType,
+                'typePrice' => $session['typePrice'],
+                'typePriceName' => $session['typePriceName'],
         ]);
     }
 
@@ -60,7 +73,7 @@ class DiscountsController extends Controller {
      */
     public function actionView($id) {
         return $this->render('view', [
-                    'model' => $this->findModel($id),
+                'model' => $this->findModel($id),
         ]);
     }
 
@@ -76,7 +89,7 @@ class DiscountsController extends Controller {
         $post = Yii::$app->request->post();
         if (Yii::$app->request->isPost) {
             $post['Discounts']['providers_id'] = $session['providerIdFullName'];
-//            $post['Discounts']['values'] = $post['Discounts']['values'] . ' ';
+            $post['Discounts']['price_type_id'] = $session['typePrice'];
             $res = $model->load($post);
         }
 
@@ -90,9 +103,10 @@ class DiscountsController extends Controller {
             return $this->redirect(['index']);
         } else {
             return $this->render('create', [
-                        'model' => $model,
-                        'arTypes' => $arTypes,
-                        'providerName' => $session['providerIdFullNameName'],
+                    'model' => $model,
+                    'arTypes' => $arTypes,
+                    'providerName' => $session['providerIdFullNameName'],
+                    'typePriceName' => $session['typePriceName'],
             ]);
         }
     }
@@ -110,8 +124,6 @@ class DiscountsController extends Controller {
         $session->open();
         $post = Yii::$app->request->post();
         if (Yii::$app->request->isPost) {
-            $post['Discounts']['providers_id'] = $session['providerIdFullName'];
-//            $post['Discounts']['values'] = $post['Discounts']['values'] . ' ';
             $res = $model->load($post);
         }
 
@@ -125,9 +137,10 @@ class DiscountsController extends Controller {
             return $this->redirect(['index']);
         } else {
             return $this->render('update', [
-                        'model' => $model,
-                        'arTypes' => $arTypes,
-                        'providerName' => $session['providerIdFullNameName'],
+                    'model' => $model,
+                    'arTypes' => $arTypes,
+                    'providerName' => $session['providerIdFullNameName'],
+                    'typePriceName' => $session['typePriceName'],
             ]);
         }
     }

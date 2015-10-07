@@ -55,7 +55,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     //console.log(data)
                 }
         );
-        console.log(ser);
     });
 
     $('.f-op-cl').click(function () {

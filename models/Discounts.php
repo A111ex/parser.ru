@@ -33,8 +33,8 @@ class Discounts extends \yii\db\ActiveRecord {
      */
     public function rules() {
         return [
-            [['providers_id', 'goods_type_type', 'coef'], 'required'],
-            [['providers_id'], 'integer'],
+            [['providers_id', 'goods_type_type', 'coef', 'price_type_id'], 'required'],
+            [['providers_id', 'price_type_id'], 'integer'],
             [['coef'], 'number'],
             [['goods_type_type'], 'string', 'max' => 45],
             [['params', 'values'], 'string', 'max' => 255],
@@ -54,6 +54,7 @@ class Discounts extends \yii\db\ActiveRecord {
             'params' => 'Название параметров товара',
             'values' => 'Значения параметров',
             'coef' => 'Козффициент',
+            'price_type_id' => 'Типа цены',
         ];
     }
 
@@ -69,6 +70,13 @@ class Discounts extends \yii\db\ActiveRecord {
      */
     public function getGoodsTypeType() {
         return $this->hasOne(GoodsType::className(), ['type' => 'goods_type_type']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPriceType() {
+        return $this->hasOne(PriceType::className(), ['id' => 'price_type_id']);
     }
 
     public function trim($attribute, $params) {

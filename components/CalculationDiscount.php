@@ -15,10 +15,10 @@ class CalculationDiscount extends Object {
 
     private static $arDisconts;
 
-    public static function calc($goods_id, $providers_id) {
+    public static function calc($goods_id, $providers_id, $priceType) {
         //Получить список наценок
         if (!isset(self::$arDisconts)) {
-            $arODisconts = \app\models\Discounts::find()->asArray()->all();
+            $arODisconts = \app\models\Discounts::find()->where('price_type_id = :price_type_id', [':price_type_id'=>$priceType])->asArray()->all();
 
             self::$arDisconts = [];
             foreach ($arODisconts as $arDiscont) {

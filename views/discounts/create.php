@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\Discounts */
 
-$this->title = 'Создать наценку для поставщика "'.$providerName.'"';
+$this->title = 'Создать наценку цены "' . $typePriceName . '" поставщика "'.$providerName.'"';
 $this->params['breadcrumbs'][] = ['label' => 'Наценки', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
