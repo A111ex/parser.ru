@@ -199,7 +199,7 @@ class GoodsParamsController extends Controller {
                 print ('<pre>');
                 print_r($ar);
                 print('</pre>');
-//                \app\models\Goods::deleteAll('id=:goods_id', [':goods_id' => $good->goods_id]);
+                \app\models\Goods::deleteAll('id=:goods_id', [':goods_id' => $good->goods_id]);
             }
         }
     }
