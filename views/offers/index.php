@@ -14,6 +14,15 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    
+    
+    <p>Тип цены: 
+        <?php
+        foreach ($arrPriceType as $k => $v) {
+            print Html::a($v, ['index', 'typePrice' => $k], ['class' => ('btn btn-primary' . (($typePrice == $k) ? ' active' : ''))]) . '&nbsp;';
+        }
+        ?>
+    </p>
 
     <div class="btn btn-success f-open f-op-cl">Закрыть фильтр</div>
     <div class="shortFiltr hide" style='display: inline-block;'></div>

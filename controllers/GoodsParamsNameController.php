@@ -100,7 +100,7 @@ class GoodsParamsNameController extends Controller {
             $dataType = $arPost['GoodsParamsName']['data_type'];
             $required = ($arPost['GoodsParamsName']['required']) ? ' NOT NULL' : '';
 //            $sql = "ALTER TABLE `$table` ADD `$fild` $dataType $required";
-            $sql = "ALTER TABLE `$table` ADD `$fild` int $required";
+            $sql = "ALTER TABLE `$table` ADD `$fild` int(7) $required";
             \Yii::$app->db->createCommand($sql)->execute();
 
             // ALTER TABLE `goods_t_tyre` ADD `with` INT NOT NULL

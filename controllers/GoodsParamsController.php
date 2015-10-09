@@ -182,6 +182,7 @@ class GoodsParamsController extends Controller {
      * @return mixed
      */
     public function actionTech() {
+        exit;
         $GoodsParamsName = \app\models\GoodsParamsName::find()->all();
         foreach ($GoodsParamsName as $gpn) {
             print '============================== <br>';

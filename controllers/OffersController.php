@@ -29,7 +29,7 @@ class OffersController extends Controller {
      * Lists all offers models.
      * @return mixed
      */
-    public function actionIndex() {
+    public function actionIndex($typePrice = null) {
         $gt = \app\models\GoodsType::find()->orderBy('name')->all();
         $gp = \app\models\Providers::find()->orderBy('id')->all();
 
@@ -37,9 +37,27 @@ class OffersController extends Controller {
         $goodsProvider = \yii\helpers\ArrayHelper::map($gp, 'id', 'name');
         $goodsProvider = ['' => ' - Все - '] + $goodsProvider;
 
+        $session = Yii::$app->session;
+        $session->open();
+
+        $arrPriceType = \yii\helpers\ArrayHelper::map(\app\models\PriceType::find()->all(), 'id', 'name');
+
+        if ($typePrice) {
+            $session['typePrice'] = $typePrice;
+            $session['typePriceName'] = $arrPriceType[$typePrice];
+            $this->redirect('/' . $this->id);
+        }elseif (intval ($session['typePrice']) == 0) {
+            $arW = array_keys($arrPriceType);
+            $session['typePrice'] = array_shift($arW) ;
+            $session['typePriceName'] = $arrPriceType[$session['typePrice']];
+            $this->redirect('/' . $this->id);
+        }
+
         return $this->render('index', [
                 'goodsType' => $goodsType,
                 'goodsProvider' => $goodsProvider,
+                'arrPriceType' => $arrPriceType,
+                'typePrice' => $session['typePrice'],
         ]);
     }
 
@@ -133,11 +151,15 @@ class OffersController extends Controller {
             $providers = \app\models\Providers::find()->all();
             $arProviders = \yii\helpers\ArrayHelper::map($providers, 'id', 'name');
 
+            $session = Yii::$app->session;
+            $session->open();
+
             print $this->renderPartial('list', [
                     'arParamsType' => $arParamsType,
                     'items' => $items,
                     'arrGoodsValues' => $arrGoodsValues,
                     'arProviders' => $arProviders,
+                    'typePrice' => $session['typePrice'],
             ]);
         }
 
