@@ -191,7 +191,7 @@ class GoodsParamsController extends Controller {
             $arGP = \yii\helpers\ArrayHelper::map($oGP, 'id', 'id');
             print implode(',',$arGP).'<br>';
 //            $goods = \app\components\Goods::find($gpn->goods_type_type, $gpn->id . ' not in (:ids)', [':ids' => implode(',',$arGP)])->all();
-            $goods = \app\components\Goods::find($gpn->goods_type_type, $gpn->id . ' not in ('.implode(',',$arGP).')')->all();
+            $goods = \app\components\Goods::find($gpn->goods_type_type, $gpn->id . ' not in ('.implode(',',$arGP).')',[])->all();
             foreach ($goods as $good) {
                 $ar = \yii\helpers\ArrayHelper::toArray($good);
                 print ('<pre>');print_r($ar);print('</pre>');
