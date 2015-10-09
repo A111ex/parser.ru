@@ -185,16 +185,20 @@ class GoodsParamsController extends Controller {
         $GoodsParamsName = \app\models\GoodsParamsName::find()->all();
         foreach ($GoodsParamsName as $gpn) {
             print '============================== <br>';
-            print $gpn->id.'<br>';
-            $oGP = \app\models\GoodsParams::find()->where('goods_params_name_id=:goods_params_name_id', [':goods_params_name_id'=>$gpn->id])->all();
+            print $gpn->id . '<br>';
+            $oGP = \app\models\GoodsParams::find()->where('goods_params_name_id=:goods_params_name_id', [':goods_params_name_id' => $gpn->id])->all();
 //            print ('<pre>');print_r($oGP);print('</pre>');
             $arGP = \yii\helpers\ArrayHelper::map($oGP, 'id', 'id');
-            print implode(',',$arGP).'<br>';
+            print implode(',', $arGP) . '<br>';
+            if (count($arGP) == 0)
+                continue;
 //            $goods = \app\components\Goods::find($gpn->goods_type_type, $gpn->id . ' not in (:ids)', [':ids' => implode(',',$arGP)])->all();
-            $goods = \app\components\Goods::find($gpn->goods_type_type, $gpn->id . ' not in ('.implode(',',$arGP).')',[])->all();
+            $goods = \app\components\Goods::find($gpn->goods_type_type, $gpn->id . ' not in (' . implode(',', $arGP) . ')', [])->all();
             foreach ($goods as $good) {
                 $ar = \yii\helpers\ArrayHelper::toArray($good);
-                print ('<pre>');print_r($ar);print('</pre>');
+                print ('<pre>');
+                print_r($ar);
+                print('</pre>');
 //                \app\models\Goods::deleteAll('id=:goods_id', [':goods_id' => $good->goods_id]);
             }
         }
