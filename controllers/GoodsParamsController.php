@@ -65,17 +65,17 @@ class GoodsParamsController extends Controller {
         $params = Yii::$app->request->queryParams;
         $params['GoodsParamsSearch']['goods_params_name_id'] = $this->oGoodsParamsName->id;
         $dataProvider = $searchModel->search($params);
-        
+
         $parentsValues = false;
-        if($this->oGoodsParamsName->parent_param){
+        if ($this->oGoodsParamsName->parent_param) {
             $parentsValues = GoodsParams::find()->where('goods_params_name_id = :goods_params_name_id', [':goods_params_name_id' => $this->oGoodsParamsName->parent_param])->all();
             $parentsValues = \yii\helpers\ArrayHelper::map($parentsValues, 'id', 'value');
         }
 
         return $this->render('index', [
-                    'searchModel' => $searchModel,
-                    'dataProvider' => $dataProvider,
-                    'parentsValues' => $parentsValues,
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'parentsValues' => $parentsValues,
         ]);
     }
 
@@ -86,7 +86,7 @@ class GoodsParamsController extends Controller {
      */
     public function actionView($id) {
         return $this->render('view', [
-                    'model' => $this->findModel($id),
+                'model' => $this->findModel($id),
         ]);
     }
 
@@ -118,8 +118,8 @@ class GoodsParamsController extends Controller {
             }
 
             return $this->render('create', [
-                        'model' => $model,
-                        'arParams' => $arParams,
+                    'model' => $model,
+                    'arParams' => $arParams,
             ]);
         }
     }
@@ -149,8 +149,8 @@ class GoodsParamsController extends Controller {
                 $arParams[$value->id] = $value->value;
             }
             return $this->render('update', [
-                        'model' => $model,
-                        'arParams' => $arParams,
+                    'model' => $model,
+                    'arParams' => $arParams,
             ]);
         }
     }
@@ -162,9 +162,42 @@ class GoodsParamsController extends Controller {
      * @return mixed
      */
     public function actionDelete($id) {
-        $this->findModel($id)->delete();
+
+        $goodParam = $this->findModel($id);
+        $goodParamName = \app\models\GoodsParamsName::findOne($goodParam->goods_params_name_id);
+
+        $goods = \app\components\Goods::find($goodParamName->goods_type_type, $goodParam->goods_params_name_id . '=:id', [':id' => $goodParam->id])->all();
+        foreach ($goods as $good) {
+
+            \app\models\Goods::deleteAll('id=:goods_id', [':goods_id' => $good->goods_id]);
+        }
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Deletes an existing GoodsParams model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionTech() {
+        $GoodsParamsName = \app\models\GoodsParamsName::find()->all();
+        foreach ($GoodsParamsName as $gpn) {
+            print '============================== <br>';
+            print $gpn->id.'<br>';
+            $oGP = \app\models\GoodsParams::find()->where('goods_params_name_id=:goods_params_name_id', [':goods_params_name_id'=>$gpn->id])->all();
+//            print ('<pre>');print_r($oGP);print('</pre>');
+            $arGP = \yii\helpers\ArrayHelper::map($oGP, 'id', 'id');
+            print implode(',',$arGP).'<br>';
+//            $goods = \app\components\Goods::find($gpn->goods_type_type, $gpn->id . ' not in (:ids)', [':ids' => implode(',',$arGP)])->all();
+            $goods = \app\components\Goods::find($gpn->goods_type_type, $gpn->id . ' not in ('.implode(',',$arGP).')')->all();
+            foreach ($goods as $good) {
+                $ar = \yii\helpers\ArrayHelper::toArray($good);
+                print ('<pre>');print_r($ar);print('</pre>');
+//                \app\models\Goods::deleteAll('id=:goods_id', [':goods_id' => $good->goods_id]);
+            }
+        }
     }
 
     /**

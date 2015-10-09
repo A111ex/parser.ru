@@ -40,12 +40,12 @@ class Goods extends Object {
         $tpl = $goodType->template_view;
         if ($mode == 'array') {
             return [
-                'name'=>self::fullName($arParams, $tpl),
+                'name' => self::fullName($arParams, $tpl),
                 'goodTipe' => $goodType,
                 'good' => $good,
                 'params' => $arGoodsParamsNames,
                 'values' => $arParams,
-                ];
+            ];
         }
         return self::fullName($arParams, $tpl);
     }
@@ -95,7 +95,9 @@ class Goods extends Object {
         return $goodId;
     }
 
-    public static function getOGood($id) {
+    public static function find($type, $cond, $params) {
+        \app\models\GoodsT::$tabName = self::$goodTablePefix . $type;
+        return \app\models\GoodsT::find()->where($cond, $params);
     }
 
     public static function getGoodTypeParams($goodTypeId) {
