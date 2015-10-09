@@ -15,7 +15,7 @@
     <tbody>
         <?php foreach ($items as $item) { ?>
             <?php
-            $newPrice = $item['price'] * \app\components\CalculationDiscount::calc($item['goods_id'], $item['providers_id']);
+//            $newPrice = $item['price'] * \app\components\CalculationDiscount::calc($item['goods_id'], $item['providers_id']);
             $vigoda = $newPrice - $item['price'];
             ?>
             <tr>
