@@ -52,7 +52,7 @@ class FindAccords extends Object {
                 $arStrCSV = str_getcsv($strCSV, ';');
                 // Пропустить неполные строки
                 if (strlen(trim($arStrCSV[$this->arrAccords['name']])) == 0 || strlen(trim($arStrCSV[$this->arrAccords['price']])) == 0 || strlen(trim($arStrCSV[$this->arrAccords['quantity']])) == 0){
-                    \Yii::$app->log($strCSV, Logger::LEVEL_INFO, 'parser_log');
+                    \Yii::info($strCSV, 'parser_log');
                     continue;
                 }
                 // Нормализовать массив строки от текущего поставщика
