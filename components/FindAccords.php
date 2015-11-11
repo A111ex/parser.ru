@@ -34,7 +34,7 @@ class FindAccords extends Object {
         if (Yii::$app->cache->exists($key)) {
             $arRes = Yii::$app->cache->get($key);
         } else {
-            // Eдалить старые предложения поставщика
+            // Удалить старые предложения поставщика
             \app\models\Offers::deleteAll('providers_id = :providers_id', [':providers_id' => $this->providerId]);
             
             // Сохранить дату последней загрузки прайса
@@ -51,8 +51,10 @@ class FindAccords extends Object {
                 // Строку в массив
                 $arStrCSV = str_getcsv($strCSV, ';');
                 // Пропустить неполные строки
-                if (strlen(trim($arStrCSV[$this->arrAccords['name']])) == 0 || strlen(trim($arStrCSV[$this->arrAccords['price']])) == 0 || strlen(trim($arStrCSV[$this->arrAccords['quantity']])) == 0)
+                if (strlen(trim($arStrCSV[$this->arrAccords['name']])) == 0 || strlen(trim($arStrCSV[$this->arrAccords['price']])) == 0 || strlen(trim($arStrCSV[$this->arrAccords['quantity']])) == 0){
+                    \Yii::$app->log($strCSV, Logger::LEVEL_INFO, 'parser_log');
                     continue;
+                }
                 // Нормализовать массив строки от текущего поставщика
                 $arResRow = $this->normalizeStrOfPrice($arStrCSV);
                 // Получить тип товара

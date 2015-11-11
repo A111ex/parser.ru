@@ -1,7 +1,6 @@
 <?php
 
 use yii\helpers\Html;
-
 $btns = <<<HERE
 <table class = 'buttons_table table table-condensed'>
     <tr>
