@@ -6,6 +6,6 @@ function normalizeStrOfPrice($arStrCSV) {
     $arRes['name'] = "Автошина {$name}";
     $price = str_replace(array(" ", "-"), array("", ","), $arStrCSV[3]);
     $arRes['price'] = floatval($price);
-    $arRes['count'] = intval(str_replace(array("\"", ">", "более"), '', $arStrCSV[2]));
+    $arRes['count'] = intval(str_replace(array("\"", ">", "более", ' '), '', $arStrCSV[2]));
     return $arRes;
 }
