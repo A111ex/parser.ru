@@ -172,9 +172,9 @@ HERE;
             });
         },
         append: function (posts) {
-            posts = (posts instanceof Array) ? posts : [];
+            var posts = (posts instanceof Array) ? posts : [];
             this.posts = this.posts.concat(posts);
-
+            
             for (var i = 0, len = posts.length; i < len; i++) {
                 var post = posts[i];
                 this.target.append(this.render(post));
@@ -214,6 +214,7 @@ HERE;
                     posts.push(data[i]);
                 }
                 if (posts.length > 0) {
+                    console.log(posts);
                     that.append(posts);
                 }
                 that.setBusy(false);
