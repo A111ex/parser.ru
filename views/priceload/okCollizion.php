@@ -210,15 +210,10 @@ HERE;
             $.getJSON('/<?= $this->context->id ?>/get-items', {count: this.count, last: lastId},
             function (data) {
                 var posts = [];
-                console.log('==');
-                console.log(data);
                 for (var i in data) {
-                    console.log(i);
-                    console.log(data[i]);
                     posts.push(data[i]);
                 }
                 if (posts.length > 0) {
-                    console.log(posts);
                     that.append(posts);
                 }
                 that.setBusy(false);

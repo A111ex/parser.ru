@@ -213,5 +213,19 @@ class UnloadingController extends Controller {
             $this->_unloadStr($files['zip'], file_get_contents($files['path'] . $files['zip']));
         }
     }
-
+    
+   public function behaviors() {
+        return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => [],
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
+    }
 }

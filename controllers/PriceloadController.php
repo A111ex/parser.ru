@@ -21,7 +21,7 @@ class PriceloadController extends Controller {
      * @return mixed
      */
     public function actionIndex($providerId) {
-        
+
         $model = new PriceloadForm();
         if (Yii::$app->request->isPost) {
             $model->fileName = UploadedFile::getInstance($model, 'fileName');
@@ -119,8 +119,8 @@ class PriceloadController extends Controller {
 
 
         return $this->render('okCollizion', [
-                    'arRes' => $arRes,
-                    'providerId' => $providerId,
+                'arRes' => $arRes,
+                'providerId' => $providerId,
         ]);
     }
 
@@ -154,13 +154,6 @@ class PriceloadController extends Controller {
             if ($cnt++ >= $count)
                 break;
         }
-//        foreach ($arRes['arrToAccord'] as $row) {
-//            if (++$cnt <= $last)
-//                continue;
-//            $arItems[$cnt] = $row;
-//            if ($cnt >= $count + $last)
-//                break;
-//        }
         print json_encode($arItems);
     }
 
@@ -277,6 +270,21 @@ class PriceloadController extends Controller {
         Yii::$app->cache->delete($arRes['key']);
         unlink(Yii::$app->params['uploadFolder'] . $providerId . '.csv');
         $this->redirect('/');
+    }
+
+    public function behaviors() {
+        return [
+            'access' => [
+                'class' => \yii\filters\AccessControl::className(),
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => [],
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+        ];
     }
 
 }

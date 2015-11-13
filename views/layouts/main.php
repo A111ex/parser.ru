@@ -43,8 +43,8 @@ AppAsset::register($this);
                     ['label' => 'Выгрузка', 'url' => ['/unloading/index']],
                     ['label' => 'Тип цен', 'url' => ['/price-type/index']],
                     Yii::$app->user->isGuest ?
-                            ['label' => 'Login', 'url' => ['/site/login']] :
-                            ['label' => 'Logout (' . Yii::$app->user->identity->username . ')',
+                            ['label' => 'Авторизация', 'url' => ['/site/login']] :
+                            ['label' => 'Выйти (' . Yii::$app->user->identity->username . ')',
                         'url' => ['/site/logout'],
                         'linkOptions' => ['data-method' => 'post']],
                 ],
