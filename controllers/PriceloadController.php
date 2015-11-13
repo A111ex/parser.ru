@@ -145,15 +145,22 @@ class PriceloadController extends Controller {
         // Запустить парсер
         $FindAccords = new FindAccords($providerId, $filename, $metaProv['accords']);
         $arRes = $FindAccords->run();
-        $cnt = 0;
+        $cnt = 1;
         $arItems = [];
         foreach ($arRes['arrToAccord'] as $row) {
-            if (++$cnt <= $last)
+            if ($row['k'] <= $last)
                 continue;
-            $arItems[$cnt] = $row;
-            if ($cnt >= $count + $last)
+            $arItems[$row['k']] = $row;
+            if ($cnt++ >= $count)
                 break;
         }
+//        foreach ($arRes['arrToAccord'] as $row) {
+//            if (++$cnt <= $last)
+//                continue;
+//            $arItems[$cnt] = $row;
+//            if ($cnt >= $count + $last)
+//                break;
+//        }
         print json_encode($arItems);
     }
 
