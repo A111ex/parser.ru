@@ -213,6 +213,8 @@ HERE;
                 console.log('==');
                 console.log(data);
                 for (var i in data) {
+                    console.log(i);
+                    console.log(data[i]);
                     posts.push(data[i]);
                 }
                 if (posts.length > 0) {
