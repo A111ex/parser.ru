@@ -210,6 +210,8 @@ HERE;
             $.getJSON('/<?= $this->context->id ?>/get-items', {count: this.count, last: lastId},
             function (data) {
                 var posts = [];
+                console.log('==');
+                console.log(data);
                 for (var i in data) {
                     posts.push(data[i]);
                 }
