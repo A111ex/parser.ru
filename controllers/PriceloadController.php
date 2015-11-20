@@ -190,7 +190,7 @@ class PriceloadController extends Controller {
      * @return mixed
      */
     public function actionGetChildParams($k, $paramId, $parentParamVal) {
-        $GoodsParams = \app\models\GoodsParams::find()->where('link_category=:parentId', [':parentId' => $parentParamVal])->orderBy('sort')->all();
+        $GoodsParams = \app\models\GoodsParams::find()->where('link_category=:parentId AND goods_params_name_id=:goods_params_name_id', [':parentId' => $parentParamVal,':goods_params_name_id'=>$paramId])->orderBy('sort')->all();
         $arParams = [];
         foreach ($GoodsParams as $oParam) {
             $arParams[$oParam->id] = $oParam->value;
