@@ -33,13 +33,13 @@ $config = [
             'useFileTransport' => true,
         ],
         'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
-            'targets' => [
-                [
-                    'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
-                ],
-            ],
+//            'traceLevel' => YII_DEBUG ? 3 : 0,
+//            'targets' => [
+//                [
+//                    'class' => 'yii\log\FileTarget',
+//                    'levels' => ['error', 'warning'],
+//                ],
+//            ],
         ],
         'db' => require(__DIR__ . '/db.php'),
         'urlManager' => [
@@ -82,10 +82,10 @@ $config = [
     'params' => $params,
 ];
 
-if (YII_ENV_DEV || true) {
+if (YII_ENV_DEV) {
     // configuration adjustments for 'dev' environment
     $config['bootstrap'][] = 'debug';
-//    $config['modules']['debug'] = 'yii\debug\Module';
+    $config['modules']['debug'] = 'yii\debug\Module';
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = 'yii\gii\Module';
