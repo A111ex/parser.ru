@@ -18,8 +18,8 @@ class UnloadingController extends Controller {
         }
 
         $arrPriceType = \yii\helpers\ArrayHelper::map(\app\models\PriceType::find()->all(), 'id', 'name');
-        $arrPriceType = [''=> ' - Не выбран тип цены - ']+$arrPriceType;
-        
+        $arrPriceType = ['' => ' - Не выбран тип цены - '] + $arrPriceType;
+
         return $this->render('index', [
                 'arProfiles' => $arProfiles,
                 'arrPriceType' => $arrPriceType,
@@ -104,7 +104,7 @@ class UnloadingController extends Controller {
 
             function saveRow($curGoodId, $arOffers, &$arStrToSave) {
                 $arrGood = Goods::getName($curGoodId, 'array');
-                    
+
                 $arRow['good']['id'] = $curGoodId;
                 $arRow['good']['heigth'] = $arrGood['values']['tyre_heigth'];
                 $arRow['good']['width'] = $arrGood['values']['tyre_width'];
@@ -117,18 +117,53 @@ class UnloadingController extends Controller {
                 $arRow['good']['season'] = $arrGood['values']['tyre_season'];
                 $arRow['good']['type_auto'] = $arrGood['values']['tyre_type_auto'];
                 $arRow['good']['spike'] = ($arrGood['values']['tyre_spike']) ? 'да' : '';
-                
+
                 $arRow['offers'] = $arOffers;
-                
+
                 $arStrToSave[] = serialize($arRow);
             }
-            
+
+            function saveOffer($arOffer, &$arStrToSave) {
+
+                $curGoodId = $arOffer['goods_id'];
+
+                if (!isset($arStrToSave[$curGoodId])) {
+                    $arrGood = Goods::getName($curGoodId, 'array');
+
+                    $arRow['id'] = $curGoodId;
+                    $arRow['goods_type'] = $arOffer['goods_type_type'];
+                    $arRow['name'] = Goods::getName($curGoodId);
+                    $arRow['heigth'] = $arrGood['values']['tyre_heigth'];
+                    $arRow['width'] = $arrGood['values']['tyre_width'];
+                    $arRow['dia'] = $arrGood['values']['tyre_dia'];
+                    $arRow['i_load'] = $arrGood['values']['tyre_i_load'];
+                    $arRow['i_speed'] = $arrGood['values']['tyre_i_speed'];
+                    $arRow['model'] = $arrGood['values']['tyre_model'];
+                    $arRow['rf'] = ($arrGood['values']['tyre_rf']) ? 'да' : '';
+                    $arRow['brand'] = $arrGood['values']['tyre_brand'];
+                    $arRow['season'] = $arrGood['values']['tyre_season'];
+                    $arRow['type_auto'] = $arrGood['values']['tyre_type_auto'];
+                    $arRow['spike'] = ($arrGood['values']['tyre_spike']) ? 'да' : '';
+
+                    $arStrToSave[$curGoodId]['g'] = $arRow;
+                }
+
+                unset($arOffer['name'], $arOffer['goods_type_type']);
+
+                $arStrToSave[$curGoodId]['o'][$arOffer['providers_id']] = $arOffer;
+            }
+
             function saveFiles($file, $arStrToSave) {
+                foreach ($arStrToSave as $gId => $arGO) {
+                    $arStrToSave[$gId] = json_encode($arGO);
+                }
                 file_put_contents($file, implode(chr(10), $arStrToSave));
             }
 
-            $file = $_SERVER['DOCUMENT_ROOT'] . '/unload/tyre_bitrix.txt';
-            
+            $folder_local = $_SERVER['DOCUMENT_ROOT'] . '/unload/';
+            $file_name = 'tyre_bitrix.txt';
+            $file = $folder_local . $file_name;
+
             $arStrToSave = [];
 
             // Список поставщиков
@@ -140,28 +175,74 @@ class UnloadingController extends Controller {
 
             $curGoodId = 0;
             foreach ($arOffers as $arOffer) {
-                if ($arOffer['goods_id'] != $curGoodId) {
-                    if ($curGoodId != 0) {
-                        // Сохранить записи в файлах
-                        saveRow($curGoodId, $arCurOffers, $arStrToSave);
-                    }
-                    $arCurOffers = [];
-                }
-                $curGoodId = $arOffer['goods_id'];
-                
-                $arCurOffers[$arOffer['providers_id']] = $arOffer;
+                saveOffer($arOffer, $arStrToSave);
             }
-            
+
             // Сохранить на диск
             saveFiles($file, $arStrToSave);
 
-            // оттать архив
-            
+            // передать на сайт
+            $host = 'brevitas.timeweb.ru';
+            $user = 'shina93';
+            $password = '64bc9f4f36';
+            $folder_remout = '/home/s/shina93/shincenter/public_html/upload/';
+            $this->sendTrouthFTP($host, $user, $password, $folder_local, $file_name, $folder_remout);
         }
     }
-    
-    
-    
+
+    private function sendTrouthFTP($host, $user, $password, $folder_local, $file_name, $folder_remout) {
+
+// Соединение с удаленным FTP-сервером
+        print "Соединение с сервером $host<br>";
+        $connect = ftp_connect($host);
+        if (!$connect) {
+            echo("Ошибка соединения");
+            exit;
+        } else {
+            echo("Соединение установлено<br><br>");
+        }
+
+
+// Регистрация на FTP-сервере
+        print "Регистрация на FTP-сервере<br>Логин $user<br>Пароль $password<br>";
+        $result = ftp_login($connect, $user, $password);
+        if (!$result) {
+            echo("Не залогинились");
+            exit;
+        } else {
+            echo("Залогинились<br><br>");
+        }
+        ftp_pasv($connect, true);
+
+
+//  $new_dir = "home/i/itwebnetru/rusneon/public_html";
+// сохраняем имя текущего рабочего каталога
+        print $current_dir = ftp_pwd($connect);
+
+//        $folder_remout = "/rusneon/public_html/";
+//        $folder_remout = $current_dir;
+
+// Копируем файл
+
+
+
+//        $folder_local = $_SERVER['DOCUMENT_ROOT'] . "/";
+//        $file_name = "200812111155_1ddbf8a5.tar.gz";
+
+
+        $rrr = ftp_put($connect, $folder_local . $file_name, $folder_remout . $file_name, FTP_BINARY);
+        print "Копирование файла $file_name<br>";
+        if (!$rrr) {
+            echo("Завершилось неудачей (((");
+        } else {
+            echo("Удачно скопировано )))");
+        }
+
+
+// Закрываем соединение
+        ftp_quit($connect);
+    }
+
 //    private function profileTyreBitrix($mode = 'run', $priceType = null) {
 //        if ($mode == 'info') {
 //            return [
@@ -282,8 +363,8 @@ class UnloadingController extends Controller {
 //            $this->_unloadStr($files['zip'], file_get_contents($files['path'] . $files['zip']));
 //        }
 //    }
-    
-   public function behaviors() {
+
+    public function behaviors() {
         return [
             'access' => [
                 'class' => \yii\filters\AccessControl::className(),
@@ -297,4 +378,5 @@ class UnloadingController extends Controller {
             ],
         ];
     }
+
 }
