@@ -57,6 +57,7 @@ class Goods extends Object {
      * @return type
      */
     public static function fullName($p, $tpl = '') {
+        $tpl = trim($tpl);
         $arKeys = [];
         $arVals = [];
         foreach ($p as $k => $v) {
