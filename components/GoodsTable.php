@@ -26,6 +26,7 @@ class GoodsTable extends Object {
         $sql = <<<SQL
 CREATE TABLE IF NOT EXISTS `goods_t_{$type}` (
   `goods_id` INT NOT NULL,
+  `name` varchar(150) NOT NULL COMMENT 'Имя',
   `discription` TEXT(3000) NULL COMMENT 'Описание',
   `photo` VARCHAR(255) NULL COMMENT 'Фото',
   PRIMARY KEY (`goods_id`),
