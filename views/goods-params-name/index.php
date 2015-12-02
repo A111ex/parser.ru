@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'required',
             'parent_param',
             // 'goods_param_namecol',
-             'sort',
+            'sort',
             // 'goods_type_type',
             [
                 'class' => 'yii\grid\ActionColumn',
@@ -41,10 +41,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     'values' => function ($url, $model, $key) {
                         return Html::a('<span class="glyphicon glyphicon-th-list"></span>', ['/goods-params', 'goodTypeParam' => $model->id], ['class' => '']);
                     }
-                        ]
-                    ],
-        ],
-    ]);
-    ?>
+                    ]
+                ],
+            ],
+        ]);
+        ?>
 
 </div>

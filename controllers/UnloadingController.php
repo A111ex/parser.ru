@@ -182,11 +182,14 @@ class UnloadingController extends Controller {
             saveFiles($file, $arStrToSave);
 
             // передать на сайт
-            $host = 'brevitas.timeweb.ru';
-            $user = 'shina93';
-            $password = '64bc9f4f36';
+            
             $folder_remout = '/home/s/shina93/shincenter/public_html/upload/';
-            $this->sendTrouthFTP($host, $user, $password, $folder_local, $file_name, $folder_remout);
+            copy($file, $folder_remout.$file_name);
+            
+//            $host = 'brevitas.timeweb.ru';
+//            $user = 'shina93';
+//            $password = '64bc9f4f36';
+//            $this->sendTrouthFTP($host, $user, $password, $folder_local, $file_name, $folder_remout);
         }
     }
 
