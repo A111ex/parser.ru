@@ -1,5 +1,5 @@
 <?php
-
+ini_set('memory_limit', '512M');
 $params = require(__DIR__ . '/params.php');
 
 $config = [

@@ -190,7 +190,11 @@ class UnloadingController extends Controller {
 //            $user = 'shina93';
 //            $password = '64bc9f4f36';
 //            $this->sendTrouthFTP($host, $user, $password, $folder_local, $file_name, $folder_remout);
-        }
+        
+            
+            
+            // import_price_from_parser.php
+            }
     }
 
     private function sendTrouthFTP($host, $user, $password, $folder_local, $file_name, $folder_remout) {
