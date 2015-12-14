@@ -162,6 +162,7 @@ class UnloadingController extends Controller {
             }
 
             function saveFiles($file, $arStrToSave) {
+                return;
                 foreach ($arStrToSave as $gId => $arGO) {
                     $arStrToSave[$gId] = json_encode($arGO);
                 }
@@ -182,7 +183,7 @@ class UnloadingController extends Controller {
             // Список оферов шин
             $sql = "select * from offers as O INNER JOIN goods as G where O.goods_id = G.id and G.goods_type_type = 'tyre'";
             $arOffers = \Yii::$app->db->createCommand($sql)->queryAll();
-            exit();
+//            exit();
             $curGoodId = 0;
             foreach ($arOffers as $k => $arOffer) {
                 if ($k % 10 == 0){ // Сохранить на диск
