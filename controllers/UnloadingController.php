@@ -162,11 +162,11 @@ class UnloadingController extends Controller {
             }
 
             function saveFiles($file, $arStrToSave) {
+                return;
                 foreach ($arStrToSave as $gId => $arGO) {
                     $arStrToSave[$gId] = json_encode($arGO);
                 }
                 print count($arStrToSave).'<br>';
-                return;
                 file_put_contents($file, implode(chr(10), $arStrToSave), FILE_APPEND);
             }
 
@@ -188,6 +188,7 @@ class UnloadingController extends Controller {
             $curGoodId = 0;
             foreach ($arOffers as $k => $arOffer) {
                 print $k.'--<br>';
+                saveOffer($arOffer, $arStrToSave);
                 if ($k % 10 == 0){ // Сохранить на диск
                     saveFiles($file, $arStrToSave);
                     $arStrToSave = [];
