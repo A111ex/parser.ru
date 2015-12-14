@@ -96,6 +96,7 @@ class UnloadingController extends Controller {
     public function actionTyreBitrix($priceType) {
         $this->profileTyreBitrix('run', $priceType);
     }
+
     private function profileTyreBitrix($mode = 'run', $priceType = null) {
         if ($mode == 'info') {
             return [
@@ -156,16 +157,22 @@ class UnloadingController extends Controller {
                 $arStrToSave[$curGoodId]['o'][$arOffer['providers_id']] = $arOffer;
             }
 
+            function clearFiles($file) {
+                file_put_contents($file, '');
+            }
+
             function saveFiles($file, $arStrToSave) {
                 foreach ($arStrToSave as $gId => $arGO) {
                     $arStrToSave[$gId] = json_encode($arGO);
                 }
-                file_put_contents($file, implode(chr(10), $arStrToSave));
+                file_put_contents($file, implode(chr(10), $arStrToSave), FILE_APPEND);
             }
 
             $folder_local = $_SERVER['DOCUMENT_ROOT'] . '/unload/';
             $file_name = 'tyre_bitrix.txt';
             $file = $folder_local . $file_name;
+
+            clearFiles($file); // Очистить файл
 
             $arStrToSave = [];
 
@@ -177,12 +184,16 @@ class UnloadingController extends Controller {
             $arOffers = \Yii::$app->db->createCommand($sql)->queryAll();
 
             $curGoodId = 0;
-            foreach ($arOffers as $arOffer) {
+            foreach ($arOffers as $k => $arOffer) {
                 saveOffer($arOffer, $arStrToSave);
+
+                if ($k % 10 == 0){ // Сохранить на диск
+                    saveFiles($file, $arStrToSave);
+                    $arStrToSave = [];
+                }
             }
 
-            // Сохранить на диск
-            saveFiles($file, $arStrToSave);
+
 
             // передать на сайт
 
@@ -193,7 +204,6 @@ class UnloadingController extends Controller {
 //            $user = 'shina93';
 //            $password = '64bc9f4f36';
 //            $this->sendTrouthFTP($host, $user, $password, $folder_local, $file_name, $folder_remout);
-            // import_price_from_parser.php
         }
     }
 
@@ -245,127 +255,6 @@ class UnloadingController extends Controller {
 // Закрываем соединение
         ftp_quit($connect);
     }
-
-//    private function profileTyreBitrix($mode = 'run', $priceType = null) {
-//        if ($mode == 'info') {
-//            return [
-//                'name' => 'Экспорт шин в Битрикс',
-//                'description' => 'Экспорт шин в Битрикс',
-//            ];
-//        }
-//        if ($mode == 'run') {
-//
-//            function saveRow($curGoodId, $arPrise, $arQunt, &$arStrToSave) {
-//                $price = min($arPrise);
-//                $provider = array_search($price, $arPrise);
-//
-//                $quant = array_sum($arQunt);
-//                $arrGood = Goods::getName($curGoodId, 'array');
-//
-//                $name = $arrGood['name'];
-//                $brend = $arrGood['values']['tyre_brand'];
-//                $model = $arrGood['values']['tyre_model'];
-//                $offerRow = "$name;$brend;$model;$quant;$price;RUB";
-//                saveRowInOffer($offerRow, $arStrToSave);
-//
-//                $IP_PROP2 = $arrGood['values']['tyre_heigth'];
-//                $IP_PROP23 = $arrGood['values']['tyre_width'];
-//                $IP_PROP21 = $arrGood['values']['tyre_dia'];
-//                $IP_PROP3 = $arrGood['values']['tyre_i_load'];
-//                $IP_PROP4 = $arrGood['values']['tyre_i_speed'];
-//                $IP_PROP13 = $arrGood['values']['tyre_model'];
-//                $IP_PROP148 = ($arrGood['values']['tyre_rf']) ? 'да' : '';
-//                $IP_PROP8 = $arrGood['values']['tyre_brand'];
-//                $IP_PROP22 = $arrGood['values']['tyre_season'];
-//                $IP_PROP24 = $arrGood['values']['tyre_type_auto'];
-//                $IP_PROP2 = $arrGood['values']['tyre_model'];
-//                $IP_PROP26 = ($arrGood['values']['tyre_spike']) ? 'да' : '';
-//                $IC_GROUP0 = $arrGood['values']['tyre_brand'];
-//                $IC_GROUP1 = $arrGood['values']['tyre_model'];
-//                $PODRAZD = $provider;
-//
-//                $goodRow = "$name;$IP_PROP2;$IP_PROP23;$IP_PROP21;$IP_PROP3;$IP_PROP4;$IP_PROP13;$IP_PROP148;$IP_PROP8;$IP_PROP22;$IP_PROP24;$IP_PROP2;$IP_PROP26;$IC_GROUP0;$IC_GROUP1;$PODRAZD";
-//                saveRowInGoods($goodRow, $arStrToSave);
-//            }
-//
-//            function saveRowInOffer($row, &$arStrToSave) {
-//                $arStrToSave['Offer'] .= $row . chr(10);
-//            }
-//
-//            function saveRowInGoods($row, &$arStrToSave) {
-//                $arStrToSave['Goods'] .= $row . chr(10);
-//            }
-//            
-//            function saveFiles($files, $arStrToSave) {
-//                file_put_contents($files['path'] . $files[1], $arStrToSave['Goods']);
-//                file_put_contents($files['path'] . $files[2], $arStrToSave['Offer']);
-//            }
-//
-//            $files = [
-//                1 => 'shina1_' . date('Y.m.d.H.i') . '.csv',
-//                2 => 'shina2_' . date('Y.m.d.H.i') . '.csv',
-//                'zip' => 'shina_' . date('Y.m.d.H.i') . '.zip',
-//                'path' => $_SERVER['DOCUMENT_ROOT'] . '/unload/tyre_bitrix/',
-//            ];
-//            
-//            $arStrToSave = [
-//                'Goods'=>'',
-//                'Offer'=>'',
-//            ];
-//
-//            // Очистить папку выгрузки профиля
-//            if ($handle = opendir($files['path'])) {
-//                $i = 0;
-//                while (false !== ($file = readdir($handle))) {
-//                    if (!in_array($file, ['.', '..']))
-//                        unlink($files['path'] . $file);
-//                }
-//                closedir($handle);
-//            }
-//
-//            // Список поставщиков
-//            $arProviders = \yii\helpers\ArrayHelper::map(\app\models\Providers::find()->all(), 'id', 'name');
-//
-//            // Список оферов шин
-//            $sql = "select * from offers as O INNER JOIN goods as G where O.goods_id = G.id and G.goods_type_type = 'tyre'";
-//            $arOffers = \Yii::$app->db->createCommand($sql)->queryAll();
-//
-//            $curGoodId = 0;
-//            saveRowInOffer('IE_NAME;IC_GROUP0;IC_GROUP1;CP_QUANTITY;CV_PRICE_1;CV_CURRENCY_1', $arStrToSave);
-//            saveRowInGoods('IE_NAME;IP_PROP2;IP_PROP23;IP_PROP21;IP_PROP3;IP_PROP4;IP_PROP13;IP_PROP148;IP_PROP8;IP_PROP22;IP_PROP24;IP_PROP2;IP_PROP26;IC_GROUP0;IC_GROUP1;Подразделение', $arStrToSave);
-//            foreach ($arOffers as $arOffer) {
-//                if ($arOffer['goods_id'] != $curGoodId) {
-//                    if ($curGoodId != 0) {
-//                        // Сохранить записи в файлах
-//                        saveRow($curGoodId, $arPrise, $arQunt, $arStrToSave);
-//                    }
-//                    $arPrise = [];
-//                    $arQunt = [];
-//                }
-//                $curGoodId = $arOffer['goods_id'];
-//
-//                $arQunt[] = $arOffer['quantity'];
-////                $arPrise[$arProviders[$arOffer['providers_id']]] = \app\components\CalculationDiscount::calc($arOffer['goods_id'], $arOffer['providers_id']) * $arOffer['price'];
-//                $arPrise[$arProviders[$arOffer['providers_id']]] =  $arOffer['price'];
-//            }
-//            
-//            // Сохранить на диск
-//            saveFiles($files, $arStrToSave);
-//
-//            // создать архив
-//            $zip = new \ZipArchive();
-//            $filename = $files['path'] . $files['zip'];
-//            if ($zip->open($filename, \ZipArchive::CREATE) !== TRUE) {
-//                exit("Невозможно открыть <$filename>\n");
-//            }
-//            $zip->addFile($files['path'] . $files[1], $files[1]);
-//            $zip->addFile($files['path'] . $files[2], $files[2]);
-//            $zip->close();
-//
-//            // оттать архив
-//            $this->_unloadStr($files['zip'], file_get_contents($files['path'] . $files['zip']));
-//        }
-//    }
 
     public function behaviors() {
         return [
