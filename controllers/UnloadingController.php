@@ -93,6 +93,9 @@ class UnloadingController extends Controller {
         }
     }
 
+    public function actionTyreBitrix($priceType) {
+        $this->profileTyreBitrix('run', $priceType);
+    }
     private function profileTyreBitrix($mode = 'run', $priceType = null) {
         if ($mode == 'info') {
             return [
@@ -182,19 +185,16 @@ class UnloadingController extends Controller {
             saveFiles($file, $arStrToSave);
 
             // передать на сайт
-            
+
             $folder_remout = '/home/s/shina93/shincenter/public_html/upload/';
-            copy($file, $folder_remout.$file_name);
-            
+            copy($file, $folder_remout . $file_name);
+
 //            $host = 'brevitas.timeweb.ru';
 //            $user = 'shina93';
 //            $password = '64bc9f4f36';
 //            $this->sendTrouthFTP($host, $user, $password, $folder_local, $file_name, $folder_remout);
-        
-            
-            
             // import_price_from_parser.php
-            }
+        }
     }
 
     private function sendTrouthFTP($host, $user, $password, $folder_local, $file_name, $folder_remout) {
@@ -228,11 +228,7 @@ class UnloadingController extends Controller {
 
 //        $folder_remout = "/rusneon/public_html/";
 //        $folder_remout = $current_dir;
-
 // Копируем файл
-
-
-
 //        $folder_local = $_SERVER['DOCUMENT_ROOT'] . "/";
 //        $file_name = "200812111155_1ddbf8a5.tar.gz";
 
@@ -376,6 +372,11 @@ class UnloadingController extends Controller {
             'access' => [
                 'class' => \yii\filters\AccessControl::className(),
                 'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['tyre-bitrix'],
+                        'roles' => ['?'],
+                    ],
                     [
                         'allow' => true,
                         'actions' => [],
