@@ -192,6 +192,9 @@ class UnloadingController extends Controller {
                     $arStrToSave = [];
                 }
             }
+            if(count($arStrToSave)>0){
+                saveFiles($file, $arStrToSave);
+            }
 
 
 
