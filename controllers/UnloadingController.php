@@ -165,6 +165,7 @@ class UnloadingController extends Controller {
                 foreach ($arStrToSave as $gId => $arGO) {
                     $arStrToSave[$gId] = json_encode($arGO);
                 }
+                print count($arStrToSave).'<br>';
                 return;
                 file_put_contents($file, implode(chr(10), $arStrToSave), FILE_APPEND);
             }
