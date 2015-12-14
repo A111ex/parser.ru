@@ -139,11 +139,11 @@ class UnloadingController extends Controller {
                     $arRow['i_load'] = $arrGood['values']['tyre_i_load'];
                     $arRow['i_speed'] = $arrGood['values']['tyre_i_speed'];
                     $arRow['model'] = $arrGood['values']['tyre_model'];
-                    $arRow['rf'] = ($arrGood['values']['tyre_rf']) ? 'да' : '';
+                    $arRow['rf'] = ($arrGood['values']['tyre_rf']) ? 44 : '';
                     $arRow['brand'] = $arrGood['values']['tyre_brand'];
                     $arRow['season'] = $arrGood['values']['tyre_season'];
                     $arRow['type_auto'] = $arrGood['values']['tyre_type_auto'];
-                    $arRow['spike'] = ($arrGood['values']['tyre_spike']) ? 'да' : '';
+                    $arRow['spike'] = ($arrGood['values']['tyre_spike']) ? 3 : '';
 
                     $arStrToSave[$curGoodId]['g'] = $arRow;
                 }
