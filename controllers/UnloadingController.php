@@ -162,10 +162,10 @@ class UnloadingController extends Controller {
             }
 
             function saveFiles($file, $arStrToSave) {
-                return;
                 foreach ($arStrToSave as $gId => $arGO) {
                     $arStrToSave[$gId] = json_encode($arGO);
                 }
+                return;
                 file_put_contents($file, implode(chr(10), $arStrToSave), FILE_APPEND);
             }
 
