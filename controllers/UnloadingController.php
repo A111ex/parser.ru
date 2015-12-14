@@ -187,6 +187,7 @@ class UnloadingController extends Controller {
 //            exit();
             $curGoodId = 0;
             foreach ($arOffers as $k => $arOffer) {
+                print $k.'--<br>';
                 if ($k % 10 == 0){ // Сохранить на диск
                     saveFiles($file, $arStrToSave);
                     $arStrToSave = [];
